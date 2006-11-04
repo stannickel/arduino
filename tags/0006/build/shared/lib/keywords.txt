@@ -1,0 +1,153 @@
+# LITERAL1 specifies constants
+
+HIGH	LITERAL1
+LOW	LITERAL1
+INPUT	LITERAL1
+OUTPUT	LITERAL1
+SERIAL	LITERAL1
+DISPLAY	LITERAL1
+PI	LITERAL1
+HALF_PI	LITERAL1
+TWO_PI	LITERAL1
+false	LITERAL1	
+true	LITERAL1	
+null	LITERAL1	
+
+
+# KEYWORD1 specifies datatypes
+
+boolean	KEYWORD1
+byte	KEYWORD1
+char	KEYWORD1
+class	KEYWORD1	
+default	KEYWORD1	
+do	KEYWORD1	
+double	KEYWORD1	
+int	KEYWORD1
+long	KEYWORD1	
+private	KEYWORD1	
+protected	KEYWORD1	
+public	KEYWORD1	
+return	KEYWORD1	
+short	KEYWORD1	
+signed	KEYWORD1
+static	KEYWORD1	
+switch	KEYWORD1	
+throw	KEYWORD1	
+try	KEYWORD1	
+unsigned	KEYWORD1
+void	KEYWORD1	
+
+
+# KEYWORD2 specifies methods and functions
+
+
+abs	KEYWORD2	abs_
+acos	KEYWORD2	acos_
++=		addassign
++		addition
+[]		arrayaccess
+asin	KEYWORD2	asin_
+=		assign
+atan	KEYWORD2	atan_
+atan2	KEYWORD2	atan2_
+&		bitwiseAND
+|		bitwiseOR
+boolean	KEYWORD1	boolean
+boolean	KEYWORD2	boolean_
+byte	KEYWORD1	byte
+byte	KEYWORD2	byte_
+case	KEYWORD1	case
+ceil	KEYWORD2	ceil_
+char	KEYWORD1	char
+char	KEYWORD2	char_
+class	KEYWORD1	class
+,		comma
+//		comment
+?:	KEYWORD1	conditional_
+constrain	KEYWORD2	constrain_
+cos	KEYWORD2	cos_
+{}		curlybraces
+--		decrement
+default	KEYWORD1	default
+delay	KEYWORD2	delay_
+delayMicroseconds	KEYWORD2
+/		divide
+/**		doccomment
+.		dot
+else	KEYWORD1	else
+==		equality
+exp	KEYWORD2	exp_
+false	KEYWORD1	false
+float	KEYWORD1	float
+float	KEYWORD2	float_
+floor	KEYWORD2	floor_
+for	KEYWORD1	for_
+<		greaterthan
+<=		greaterthanorequalto
+HALF_PI	LITERAL1	HALF_PI
+if	KEYWORD1	if_
+++		increment
+!=		inequality
+int	KEYWORD1	int
+int	KEYWORD2	int_
+<<		leftshift
+<		lessthan
+<=		lessthanorequalto
+log	KEYWORD2	log_
+&&		logicalAND
+!		logicalNOT
+||		logicalOR
+loop	KEYWORD3	loop_
+max	KEYWORD2	max_
+millis	KEYWORD2	millis_
+min	KEYWORD2	min_
+-		minus
+%		modulo
+/*		multilinecomment
+*		multiply
+new	KEYWORD1	new
+null	KEYWORD1	null
+()		parentheses
+PI	LITERAL1	PI
+return	KEYWORD1	return
+>>		rightshift
+;		semicolon
+Serial  KEYWORD3  Serial
+setup	KEYWORD3	setup_
+sin	KEYWORD2	sin_
+sq	KEYWORD2	sq_
+sqrt	KEYWORD2	sqrt_
+-=		subtractassign
+switch	KEYWORD2	switch_
+tan	KEYWORD2	tan_
+this	KEYWORD1	this
+true	KEYWORD1	true
+TWO_PI	LITERAL1	TWO_PI
+void	KEYWORD1	void
+while	KEYWORD1	while_
+
+Serial	KEYWORD2
+begin	KEYWORD2
+read	KEYWORD2
+print	KEYWORD2
+write	KEYWORD2
+println	KEYWORD2
+pulseIn	KEYWORD2
+available	KEYWORD2
+digitalWrite	KEYWORD2
+digitalRead	KEYWORD2
+pinMode	KEYWORD2
+analogRead	KEYWORD2
+analogWrite	KEYWORD2
+beginSerial	KEYWORD2
+serialWrite	KEYWORD2
+serialRead	KEYWORD2
+serialAvailable	KEYWORD2
+printString	KEYWORD2
+printInteger	KEYWORD2
+printByte	KEYWORD2
+printHex	KEYWORD2
+printOctal	KEYWORD2
+printBinary	KEYWORD2
+printNewline	KEYWORD2
