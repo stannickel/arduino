@@ -46,21 +46,21 @@
 # $Id: Makefile,v 1.7 2007/04/13 05:28:23 eighthave Exp $
 
 PORT = /dev/tty.usbserial-*
-TARGET = Pd_firmware
-ARDUINO = /Applications/arduino-0007
+TARGET = Standard_Firmata
+ARDUINO = /Applications/arduino-0011
 ARDUINO_SRC = $(ARDUINO)/hardware/cores/arduino
 ARDUINO_LIB_SRC = $(ARDUINO)/hardware/libraries
 INCLUDE = -I$(ARDUINO_SRC) -I$(ARDUINO)/hardware/tools/avr/avr/include \
 	-I$(ARDUINO_LIB_SRC)/EEPROM \
 	-I$(ARDUINO_LIB_SRC)/Firmata \
 	-I$(ARDUINO_LIB_SRC)
-SRC = $(ARDUINO_SRC)/pins_arduino.c $(ARDUINO_SRC)/wiring.c \
-	$(ARDUINO_SRC)/WInterrupts.c
+SRC = $(wildcard $(ARDUINO_SRC)/*.c)
 CXXSRC = applet/$(TARGET).cpp $(ARDUINO_SRC)/HardwareSerial.cpp \
 	$(ARDUINO_LIB_SRC)/EEPROM/EEPROM.cpp \
 	$(ARDUINO_LIB_SRC)/Firmata/Firmata.cpp \
-	$(ARDUINO_SRC)/WRandom.cpp
-MCU = atmega8
+	$(ARDUINO_SRC)/WMath.cpp
+MCU = atmega168
+#MCU = atmega8
 F_CPU = 16000000
 FORMAT = ihex
 UPLOAD_RATE = 19200
@@ -139,7 +139,7 @@ applet_files:
 	test -d applet || mkdir applet
 	echo '#include "WProgram.h"' > applet/$(TARGET).cpp
 	echo '#include "avr/interrupt.h"' >> applet/$(TARGET).cpp
-	sed -n 's|^\(void .*)\).*|\1;|p' Pd_firmware.pde | grep -v 'setup()' | \
+	sed -n 's|^\(void .*)\).*|\1;|p' $(TARGET).pde | grep -v 'setup()' | \
 		grep -v 'loop()' >> applet/$(TARGET).cpp
 	cat $(TARGET).pde >> applet/$(TARGET).cpp
 
@@ -202,7 +202,7 @@ applet/$(TARGET).elf: $(OBJ)
 
 # Compile: create object files from C source files.
 .c.o:
-	$(CC) -c $(ALL_CFLAGS) $< -o $@ 
+	$(CC)  -c $(ALL_CFLAGS) $< -o $@ 
 
 
 # Compile: create assembler files from C source files.
@@ -218,10 +218,10 @@ applet/$(TARGET).elf: $(OBJ)
 
 # Target: clean project.
 clean:
-	$(REMOVE) applet/$(TARGET).hex applet/$(TARGET).eep applet/$(TARGET).cof applet/$(TARGET).elf \
-	$(TARGET).map applet/$(TARGET).sym applet/$(TARGET).lss \
+	$(REMOVE) -- applet/$(TARGET).hex applet/$(TARGET).eep applet/$(TARGET).cof \
+	applet/$(TARGET).elf $(TARGET).map applet/$(TARGET).sym applet/$(TARGET).lss \
 	$(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(CXXSRC:.cpp=.s) $(CXXSRC:.cpp=.d)
-	find $(ARDUINO)/lib/ -name '*.o' -delete
+#	find $(ARDUINO)/lib/ -name '*.o' -delete
 
 depend:
 	if grep '^# DO NOT DELETE' $(MAKEFILE) >/dev/null; \
