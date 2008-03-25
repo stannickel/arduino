@@ -59,6 +59,8 @@ CXXSRC = applet/$(TARGET).cpp $(ARDUINO_SRC)/HardwareSerial.cpp \
 	$(ARDUINO_LIB_SRC)/EEPROM/EEPROM.cpp \
 	$(ARDUINO_LIB_SRC)/Firmata/Firmata.cpp \
 	$(ARDUINO_SRC)/WMath.cpp
+HEADERS = $(wildcard $(ARDUINO_SRC)/*.h) $(wildcard $(ARDUINO_LIB_SRC)/*/*.h)
+
 MCU = atmega168
 #MCU = atmega8
 F_CPU = 16000000
@@ -129,31 +131,12 @@ ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
 
 # Default target.
 all: build
-	echo 'close;' | /Applications/Pd-0.39.2-extended-RC1.app/Contents/Resources/bin/pdsend 34567 || true
-	say "press the button"
-	make upload
 
-build: applet_files elf hex
+build: applet/$(TARGET).hex
 
-applet_files:
-	test -d applet || mkdir applet
-	echo '#include "WProgram.h"' > applet/$(TARGET).cpp
-	echo '#include "avr/interrupt.h"' >> applet/$(TARGET).cpp
-	sed -n 's|^\(void .*)\).*|\1;|p' $(TARGET).pde | grep -v 'setup()' | \
-		grep -v 'loop()' >> applet/$(TARGET).cpp
-	cat $(TARGET).pde >> applet/$(TARGET).cpp
-
-elf: applet/$(TARGET).elf
-hex: applet/$(TARGET).hex
 eep: applet/$(TARGET).eep
 lss: applet/$(TARGET).lss 
 sym: applet/$(TARGET).sym
-
-# Program the device.  
-upload: applet/$(TARGET).hex
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
-
-
 
 
 # Convert ELF to COFF for use in debugging / simulating in AVR Studio or VMLAB.
@@ -172,7 +155,7 @@ extcoff: applet/$(TARGET).elf
 	$(COFFCONVERT) -O coff-ext-avr applet/$(TARGET).elf applet/$(TARGET).cof
 
 
-.SUFFIXES: .elf .hex .eep .lss .sym
+.SUFFIXES: .elf .hex .eep .lss .sym .pde
 
 .elf.hex:
 	$(OBJCOPY) -O $(FORMAT) -R .eeprom $< $@
@@ -190,18 +173,12 @@ extcoff: applet/$(TARGET).elf
 	$(NM) -n $< > $@
 
 
-
-# Link: create ELF output file from object files.
-applet/$(TARGET).elf: $(OBJ)
-	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
-
-
 # Compile: create object files from C++ source files.
-.cpp.o:
+.cpp.o: $(HEADERS)
 	$(CXX) -c $(ALL_CXXFLAGS) $< -o $@ 
 
 # Compile: create object files from C source files.
-.c.o:
+.c.o: $(HEADERS)
 	$(CC)  -c $(ALL_CFLAGS) $< -o $@ 
 
 
@@ -216,12 +193,36 @@ applet/$(TARGET).elf: $(OBJ)
 
 
 
+applet/$(TARGET).cpp: $(TARGET).pde
+	test -d applet || mkdir applet
+	echo '#include "WProgram.h"' > applet/$(TARGET).cpp
+	echo '#include "avr/interrupt.h"' >> applet/$(TARGET).cpp
+	sed -n 's|^\(void .*)\).*|\1;|p' $(TARGET).pde | grep -v 'setup()' | \
+		grep -v 'loop()' >> applet/$(TARGET).cpp
+	cat $(TARGET).pde >> applet/$(TARGET).cpp
+	cat $(ARDUINO_SRC)/main.cxx >> applet/$(TARGET).cpp
+
+# Link: create ELF output file from object files.
+applet/$(TARGET).elf: applet/$(TARGET).cpp $(OBJ)
+	$(CC) $(ALL_CFLAGS) $(OBJ) --output $@ $(LDFLAGS)
+
+pd_close_serial:
+	echo 'close;' | /Applications/Pd-extended.app/Contents/Resources/bin/pdsend 34567 || true
+
+# Program the device.  
+upload: applet/$(TARGET).hex
+	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
+
+
+pd_test: build pd_close_serial upload
+
 # Target: clean project.
 clean:
-	$(REMOVE) -- applet/$(TARGET).hex applet/$(TARGET).eep applet/$(TARGET).cof \
-	applet/$(TARGET).elf $(TARGET).map applet/$(TARGET).sym applet/$(TARGET).lss \
+	$(REMOVE) -- applet/$(TARGET).hex applet/$(TARGET).eep \
+	applet/$(TARGET).cof applet/$(TARGET).elf $(TARGET).map \
+	applet/$(TARGET).sym applet/$(TARGET).lss applet/$(TARGET).cpp \
 	$(OBJ) $(LST) $(SRC:.c=.s) $(SRC:.c=.d) $(CXXSRC:.cpp=.s) $(CXXSRC:.cpp=.d)
-#	find $(ARDUINO)/lib/ -name '*.o' -delete
+	rmdir -- applet
 
 depend:
 	if grep '^# DO NOT DELETE' $(MAKEFILE) >/dev/null; \
@@ -234,7 +235,7 @@ depend:
 		>> $(MAKEFILE); \
 	$(CC) -M -mmcu=$(MCU) $(CDEFS) $(INCLUDE) $(SRC) $(ASRC) >> $(MAKEFILE)
 
-.PHONY:	all build elf hex eep lss sym program coff extcoff clean depend
+.PHONY:	all build eep lss sym coff extcoff clean depend pd_close_serial pd_test
 
 # for emacs
 etags:
