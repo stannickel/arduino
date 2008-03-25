@@ -25,15 +25,17 @@
 
 #define MAX_DATA_BYTES 32 // max number of data bytes in non-Sysex messages
 
+extern "C" {
+// callback function types
+    typedef void (*analogReceiveFunction)(byte, int);
+    typedef void (*digitalReceiveFunction)(byte, int);
+//    typedef void (*sysexReceiveFunction)(byte, byte, byte*);
+}
 
 class FirmataClass
 {
 public:
 	FirmataClass();
-// callback function types
-    typedef void (FirmataClass::*analogReceiveFunction)(int);
-//    typedef void (FirmataClass::*digitalReceiveFunction)();
-//    typedef void (FirmataClass::*sysexReceiveFunction)(byte, byte, byte*);
 
 //----------------------------------------
 // methods
@@ -42,6 +44,7 @@ public:
     void begin(long);
 // querying functions
 	void printVersion(void);
+    void blinkVersion(void);
 // serial receive handling
     int available(void);
     void processInput(void);
@@ -55,7 +58,10 @@ public:
 	void saveState(void);
 	void resetState(void);
 
-    void attachAnalogReceive(int, analogReceiveFunction);
+    void attachAnalogReceive(analogReceiveFunction);
+    void detachAnalogReceive(void);
+    void attachDigitalReceive(digitalReceiveFunction);
+    void detachDigitalReceive(void);
 private:
 /* input message handling */
     byte waitForData; // this flag says the next serial input will be data
@@ -67,10 +73,8 @@ private:
 /* PWM/analog outputs */
     int pwmStatus; // bitwise array to store PWM status
 /* argc/argv pairs for callback functions */
-    byte analogReceiveFunctionCount;
-    analogReceiveFunction* analogReceiveFunctionArray;
-//    byte digitalReceiveFunctionCount;
-//    digitalReceiveFunction* digitalReceiveFunctionArray;
+    analogReceiveFunction* currentAnalogReceiveFunction;
+    digitalReceiveFunction* currentDigitalReceiveFunction;
 //    byte sysexReceiveFunctionCount;
 //    sysexReceiveFunction* sysexReceiveFunctionArray;
 
@@ -81,7 +85,6 @@ private:
     void setAnalogPinReporting(byte pin, byte state);
 	void systemReset(void);
     void pin13strobe(int count, int onInterval, int offInterval);
-    void blinkVersion(void);
 };
 
 extern FirmataClass Firmata;

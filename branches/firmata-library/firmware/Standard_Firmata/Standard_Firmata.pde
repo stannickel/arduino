@@ -56,12 +56,19 @@ void checkDigitalInputs(void)
     }
 }
 
+void analogWriteCallback(byte pin, int value)
+{
+    analogWrite(pin, value);
+}
+
 /*==============================================================================
  * SETUP()
  *============================================================================*/
 void setup() 
 {
     Firmata.begin();
+
+    Firmata.attachAnalogReceive(analogWriteCallback);
 
     // TODO: load state from EEPROM here
 

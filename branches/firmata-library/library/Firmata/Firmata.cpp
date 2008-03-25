@@ -47,12 +47,11 @@ extern "C" {
 //* Constructors
 //******************************************************************************
 
-FirmataClass::FirmataClass()
+FirmataClass::FirmataClass(void)
 {
     byte i;
 	// TODO: init serial here
 	// TODO: printVersion
-    analogReceiveFunctionCount = 0;
     waitForData = 0; // this flag says the next serial input will be data
     executeMultiByteCommand = 0; // execute this after getting multi-byte data
     multiByteChannel = 0; // channel data for multiByteCommands
@@ -74,7 +73,7 @@ FirmataClass::FirmataClass()
 //******************************************************************************
 
 /* begin method for overriding default serial bitrate */
-void FirmataClass::begin()
+void FirmataClass::begin(void)
 {
     blinkVersion();
     Serial.begin(115200);
@@ -92,10 +91,25 @@ void FirmataClass::begin(long speed)
 }
 
 // output the protocol version message to the serial port
-void FirmataClass::printVersion() {
+void FirmataClass::printVersion(void) {
     Serial.print(REPORT_VERSION, BYTE);
     Serial.print(FIRMATA_MINOR_VERSION, BYTE);
     Serial.print(FIRMATA_MAJOR_VERSION, BYTE);
+}
+
+void FirmataClass::blinkVersion(void)
+{
+    // flash the pin with the protocol version
+    pinMode(VERSION_BLINK_PIN,OUTPUT);
+    pin13strobe(2,1,4); // separator, a quick burst
+    delay(500);
+    pin13strobe(FIRMATA_MAJOR_VERSION, 200, 400);
+    delay(500);
+    pin13strobe(2,1,4); // separator, a quick burst
+    delay(500);
+    pin13strobe(FIRMATA_MINOR_VERSION, 200, 400);
+    delay(500);
+    pin13strobe(2,1,4); // separator, a quick burst
 }
 
 //------------------------------------------------------------------------------
@@ -119,8 +133,8 @@ void FirmataClass::processInput(void)
             switch(executeMultiByteCommand) {
             case ANALOG_MESSAGE:
                 setPinMode(multiByteChannel,PWM);
-                analogWrite(multiByteChannel, 
-                            (storedInputData[0] << 7) + storedInputData[1] );
+                (*currentAnalogReceiveFunction)(multiByteChannel, 
+                                             (storedInputData[0] << 7) + storedInputData[1]);
                 break;
             case DIGITAL_MESSAGE:
                 outputDigitalBytes(storedInputData[1], storedInputData[0]); //(LSB, MSB)
@@ -228,7 +242,29 @@ void FirmataClass::resetState(void)
 	// TODO reset state bytes in EEPROM
 }
 
-void FirmataClass::attachAnalogReceive(int pin, analogReceiveFunction newFunction)
+// analog callback controls
+void FirmataClass::attachAnalogReceive(analogReceiveFunction newFunction)
+{
+    currentAnalogReceiveFunction = &newFunction;
+}
+void FirmataClass::detachAnalogReceive(void)
+{
+    currentAnalogReceiveFunction = NULL;
+}
+
+// digital callback controls
+void FirmataClass::attachDigitalReceive(digitalReceiveFunction newFunction)
+{
+    currentDigitalReceiveFunction = &newFunction;
+}
+void FirmataClass::detachDigitalReceive(void)
+{
+    currentDigitalReceiveFunction = NULL;
+}
+
+/*
+ * this is too complicated for analogReceive, but maybe for Sysex?
+void FirmataClass::attachAnalogReceive(analogReceiveFunction newFunction)
 {
     byte i;
     byte tmpCount = analogReceiveFunctionCount;
@@ -239,8 +275,9 @@ void FirmataClass::attachAnalogReceive(int pin, analogReceiveFunction newFunctio
         analogReceiveFunctionArray[i] = tmpArray[i];
     }
     analogReceiveFunctionArray[tmpCount] = newFunction;
+    free(tmpArray);
 }
-
+*/
 
 //******************************************************************************
 //* Private Methods
@@ -331,21 +368,6 @@ void FirmataClass::pin13strobe(int count, int onInterval, int offInterval)
         delay(onInterval);
         digitalWrite(VERSION_BLINK_PIN, LOW);
     }
-}
-
-void FirmataClass::blinkVersion(void)
-{
-    // flash the pin with the protocol version
-    pinMode(VERSION_BLINK_PIN,OUTPUT);
-    pin13strobe(2,1,4); // separator, a quick burst
-    delay(500);
-    pin13strobe(FIRMATA_MAJOR_VERSION, 200, 400);
-    delay(500);
-    pin13strobe(2,1,4); // separator, a quick burst
-    delay(500);
-    pin13strobe(FIRMATA_MINOR_VERSION, 200, 400);
-    delay(500);
-    pin13strobe(2,1,4); // separator, a quick burst
 }
 
 // make one instance for the user to use
