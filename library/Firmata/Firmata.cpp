@@ -66,6 +66,9 @@ FirmataClass::FirmataClass(void)
   for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
     setPinMode(i,OUTPUT);
   }
+
+  currentAnalogReceiveFunction = NULL;
+  currentDigitalReceiveFunction = NULL;
 }
 
 //******************************************************************************
@@ -132,12 +135,13 @@ void FirmataClass::processInput(void)
         if( (waitForData==0) && executeMultiByteCommand ) { // got the whole message
             switch(executeMultiByteCommand) {
             case ANALOG_MESSAGE:
-                setPinMode(multiByteChannel,PWM);
-                (*currentAnalogReceiveFunction)(multiByteChannel, 
-                                             (storedInputData[0] << 7) + storedInputData[1]);
+                if(currentAnalogReceiveFunction) {
+                    setPinMode(multiByteChannel,PWM);
+                    (*currentAnalogReceiveFunction)(multiByteChannel,
+                                                    (storedInputData[0] << 7) + storedInputData[1]);
+                }
                 break;
             case DIGITAL_MESSAGE:
-                outputDigitalBytes(storedInputData[1], storedInputData[0]); //(LSB, MSB)
                 break;
             case REPORT_ANALOG_PIN:
                 setAnalogPinReporting(multiByteChannel,storedInputData[0]);
@@ -227,25 +231,10 @@ void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev)
 
 // Internal Actions/////////////////////////////////////////////////////////////
 
-void FirmataClass::loadState(void)
-{
-	// TODO load state from EEPROM
-}
-
-void FirmataClass::saveState(void)
-{
-	// TODO save state to EEPROM
-}
-
-void FirmataClass::resetState(void)
-{
-	// TODO reset state bytes in EEPROM
-}
-
 // analog callback controls
 void FirmataClass::attachAnalogReceive(analogReceiveFunction newFunction)
 {
-    currentAnalogReceiveFunction = &newFunction;
+    currentAnalogReceiveFunction = newFunction;
 }
 void FirmataClass::detachAnalogReceive(void)
 {
@@ -255,7 +244,7 @@ void FirmataClass::detachAnalogReceive(void)
 // digital callback controls
 void FirmataClass::attachDigitalReceive(digitalReceiveFunction newFunction)
 {
-    currentDigitalReceiveFunction = &newFunction;
+    currentDigitalReceiveFunction = newFunction;
 }
 void FirmataClass::detachDigitalReceive(void)
 {
@@ -283,25 +272,6 @@ void FirmataClass::attachAnalogReceive(analogReceiveFunction newFunction)
 //* Private Methods
 //******************************************************************************
 
-
-
-
-/* -----------------------------------------------------------------------------
- * output digital bytes received from the serial port  */
-void FirmataClass::outputDigitalBytes(byte pin0_6, byte pin7_13) {
-  int i;
-  int mask;
-  int twoBytesForPorts;
-    
-// this should be converted to use PORTs
-  twoBytesForPorts = pin0_6 + (pin7_13 << 7);
-  for(i=2; i<TOTAL_DIGITAL_PINS; ++i) { // ignore Rx,Tx pins (0 and 1)
-    mask = 1 << i;
-    if( (digitalPinStatus & mask) && !(pwmStatus & mask) ) {
-      digitalWrite(i, twoBytesForPorts & mask ? HIGH : LOW);
-    } 
-  }
-}
 
 // -----------------------------------------------------------------------------
 /* sets the pin mode to the correct state and sets the relevant bits in the

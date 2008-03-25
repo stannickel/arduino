@@ -27,7 +27,7 @@
 
 extern "C" {
 // callback function types
-    typedef void (*analogReceiveFunction)(byte, int);
+    typedef void (*analogReceiveFunction)(byte, int); //TODO merge into 1 functype
     typedef void (*digitalReceiveFunction)(byte, int);
 //    typedef void (*sysexReceiveFunction)(byte, byte, byte*);
 }
@@ -54,10 +54,6 @@ public:
 	void sendDigitalPortPair(int, int);
 	void sendSysex(byte, byte, byte*);
 
-	void loadState(void);
-	void saveState(void);
-	void resetState(void);
-
     void attachAnalogReceive(analogReceiveFunction);
     void detachAnalogReceive(void);
     void attachDigitalReceive(digitalReceiveFunction);
@@ -73,8 +69,8 @@ private:
 /* PWM/analog outputs */
     int pwmStatus; // bitwise array to store PWM status
 /* argc/argv pairs for callback functions */
-    analogReceiveFunction* currentAnalogReceiveFunction;
-    digitalReceiveFunction* currentDigitalReceiveFunction;
+    analogReceiveFunction currentAnalogReceiveFunction;
+    digitalReceiveFunction currentDigitalReceiveFunction;
 //    byte sysexReceiveFunctionCount;
 //    sysexReceiveFunction* sysexReceiveFunctionArray;
 
