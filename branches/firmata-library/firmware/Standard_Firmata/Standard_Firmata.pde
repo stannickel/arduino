@@ -47,12 +47,13 @@ unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
  * to the Serial output queue using Serial.print() */
 void checkDigitalInputs(void) 
 {
+    // TODO reimplement report_digital_pins
+    // TODO perhaps ignore pins 0,1 and 14,15 in checking against previous
     previousDigitalInputs = digitalInputs;
     digitalInputs = PINB << 8;  // get pins 8-13
     digitalInputs += PIND;      // get pins 0-7
     if(digitalInputs != previousDigitalInputs) {
-		// TODO: implement more ports as channels for more than 16 digital pins
-		Firmata.sendDigitalPortPair(0, digitalInputs); // port 0 till more are implemented
+		Firmata.sendDigitalPortPair(0, digitalInputs); // Arduino pins are in port 0
     }
 }
 
@@ -60,6 +61,23 @@ void analogWriteCallback(byte pin, int value)
 {
     analogWrite(pin, value);
 }
+
+void digitalWriteCallback(byte port, int value)
+{
+/* TODO should digitalPinStatus still be used?  it is useful to be able to
+ * toggle the pin when in INPUT mode in order to control the internal pull-up
+ * resistor.  Perhaps there needs to be some safety on that tho.
+ */
+    
+// pins 2-7  (0,1 are for the serial RX/TX, don't change their values)
+// 0xFF03 == B1111111100000011    0x03 == B00000011
+    PORTB = (value &~ 0xFF03) | (PORTB &~ 0x03);
+    
+//pins 8-13 (14,15 are for the crystal, don't change their values)
+// 0xffc0 == B1111111111000000    0xc0 == B11000000
+    PORTD = (value >> 8 &~ 0xFFC0) | (PORTD &~ 0xC0);   
+}
+
 
 /*==============================================================================
  * SETUP()
@@ -69,6 +87,7 @@ void setup()
     Firmata.begin();
 
     Firmata.attachAnalogReceive(analogWriteCallback);
+//    Firmata.attachDigitalReceive(digitalWriteCallback);
 
     // TODO: load state from EEPROM here
 
