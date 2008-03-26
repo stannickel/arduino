@@ -12,10 +12,9 @@
 /* 
  * TODO: generalized SysEx support
  * TODO: Bjoen Servo support
- * TODO: Firmata.read() callback registry
  * TODO: pulseOut functionality for servos
  * TODO: software PWM for servos, etc (servo.h or pulse.h)
- * TODO: device type reporting (i.e. some firmwares will use the Firmata
+ * TODO: firmware name/version reporting (i.e. some firmwares will use the Firmata
  *       protocol, but will only support specific devices, like ultrasound 
  *       rangefinders or servos)
  * TODO: use Program Control to load stored profiles from EEPROM
@@ -23,6 +22,19 @@
 
 #include <EEPROM.h>
 #include <Firmata.h>
+
+/*==============================================================================
+ * MACROS
+ *============================================================================*/
+
+// these are used for EEPROM reading and writing
+#define ANALOGINPUTSTOREPORT_LOW_BYTE   0x1F0 // analogInputsToReport is an int
+#define ANALOGINPUTSTOREPORT_HIGH_BYTE  0x1F1 // analogInputsToReport is an int
+#define REPORTDIGITALINPUTS_BYTE        0x1F2 // 
+#define DIGITALPINSTATUS_LOW_BYTE       0x1F3 // digitalPinStatus is an int
+#define DIGITALPINSTATUS_HIGH_BYTE      0x1F4 // digitalPinStatus is an int
+#define PWMSTATUS_LOW_BYTE              0x1F5 // pwmStatus is an int
+#define PWMSTATUS_HIGH_BYTE             0x1F6 // pwmStatus is an int
 
 /*==============================================================================
  * GLOBAL VARIABLES
@@ -104,11 +116,11 @@ void digitalWriteCallback(byte port, int value)
     
 // pins 2-7  (0,1 are for the serial RX/TX, don't change their values)
 // 0xFF03 == B1111111100000011    0x03 == B00000011
-    PORTB = (value &~ 0xFF03) | (PORTB &~ 0x03);
+    PORTD = (value &~ 0xFF03) | (PORTD & 0x03);
     
 //pins 8-13 (14,15 are for the crystal, don't change their values)
 // 0xffc0 == B1111111111000000    0xc0 == B11000000
-    PORTD = (value >> 8 &~ 0xFFC0) | (PORTD &~ 0xC0);   
+    PORTB = ((value >> 8) &~ 0xFFC0) | (PORTB & 0xC0);   
 }
 
 // -----------------------------------------------------------------------------
