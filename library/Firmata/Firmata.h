@@ -27,8 +27,7 @@
 
 extern "C" {
 // callback function types
-    typedef void (*analogReceiveFunction)(byte, int); //TODO merge into 1 functype
-    typedef void (*digitalReceiveFunction)(byte, int);
+    typedef void (*callbackFunction)(byte, int);
 //    typedef void (*sysexReceiveFunction)(byte, byte, byte*);
 }
 
@@ -53,11 +52,18 @@ public:
 	void sendDigital(int, int);
 	void sendDigitalPortPair(int, int);
 	void sendSysex(byte, byte, byte*);
-
-    void attachAnalogReceive(analogReceiveFunction);
+// attach & detach functions to messages
+// TODO make general attach & detach functions
+    void attachAnalogReceive(callbackFunction);
     void detachAnalogReceive(void);
-    void attachDigitalReceive(digitalReceiveFunction);
+    void attachDigitalReceive(callbackFunction);
     void detachDigitalReceive(void);
+    void attachReportAnalog(callbackFunction);
+    void detachReportAnalog(void);
+    void attachReportDigital(callbackFunction);
+    void detachReportDigital(void);
+    void attachPinMode(callbackFunction);
+    void detachPinMode(void);
 private:
 /* input message handling */
     byte waitForData; // this flag says the next serial input will be data
@@ -69,8 +75,11 @@ private:
 /* PWM/analog outputs */
     int pwmStatus; // bitwise array to store PWM status
 /* argc/argv pairs for callback functions */
-    analogReceiveFunction currentAnalogReceiveFunction;
-    digitalReceiveFunction currentDigitalReceiveFunction;
+    callbackFunction currentAnalogCallback;
+    callbackFunction currentDigitalCallback;
+    callbackFunction currentReportAnalogCallback;
+    callbackFunction currentReportDigitalCallback;
+    callbackFunction currentPinModeCallback;
 //    byte sysexReceiveFunctionCount;
 //    sysexReceiveFunction* sysexReceiveFunctionArray;
 
@@ -116,7 +125,7 @@ extern FirmataClass Firmata;
 #define REPORT_ANALOG_PIN       0xC0 // enable analog input by pin #
 #define REPORT_DIGITAL_PORTS    0xD0 // enable digital input by port pair
 //
-#define SET_DIGITAL_PIN_MODE    0xF4 // set a digital pin to INPUT or OUTPUT 
+#define SET_PIN_MODE            0xF4 // set a pin to INPUT/OUTPUT/PWM/etc
 //
 #define START_SYSEX             0xF0 // start a MIDI Sysex message
 #define END_SYSEX               0xF7 // end a MIDI Sysex message

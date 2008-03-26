@@ -67,8 +67,11 @@ FirmataClass::FirmataClass(void)
     setPinMode(i,OUTPUT);
   }
 
-  currentAnalogReceiveFunction = NULL;
-  currentDigitalReceiveFunction = NULL;
+  currentAnalogCallback = NULL;
+  currentDigitalCallback = NULL;
+  currentReportAnalogCallback = NULL;
+  currentReportDigitalCallback = NULL;
+  currentPinModeCallback = NULL;
 }
 
 //******************************************************************************
@@ -135,16 +138,31 @@ void FirmataClass::processInput(void)
         if( (waitForData==0) && executeMultiByteCommand ) { // got the whole message
             switch(executeMultiByteCommand) {
             case ANALOG_MESSAGE:
-                if(currentAnalogReceiveFunction) {
+                if(currentAnalogCallback) {
                     setPinMode(multiByteChannel,PWM);
-                    (*currentAnalogReceiveFunction)(multiByteChannel,
-                                                    (storedInputData[0] << 7) + storedInputData[1]);
+                    (*currentAnalogCallback)(multiByteChannel,
+                                                    (storedInputData[0] << 7)
+                                                    + storedInputData[1]);
                 }
                 break;
             case DIGITAL_MESSAGE:
+                if(currentDigitalCallback) {
+                    (*currentDigitalCallback)(multiByteChannel,
+                                                    (storedInputData[0] << 7)
+                                                    + storedInputData[1]);
+                }
+                break;
+            case SET_PIN_MODE:
+                if(currentPinModeCallback)
+                    (*currentPinModeCallback)(multiByteChannel,storedInputData[0]);
                 break;
             case REPORT_ANALOG_PIN:
-                setAnalogPinReporting(multiByteChannel,storedInputData[0]);
+                if(currentReportAnalogCallback)
+                    (*currentReportAnalogCallback)(multiByteChannel,storedInputData[0]);
+                break;
+            case REPORT_DIGITAL_PORTS:
+                if(currentReportDigitalCallback)
+                    (*currentReportDigitalCallback)(multiByteChannel,storedInputData[0]);
                 break;
             }
             executeMultiByteCommand = 0;
@@ -161,7 +179,7 @@ void FirmataClass::processInput(void)
         switch (command) { // TODO: these needs to be switched to command
         case ANALOG_MESSAGE:
         case DIGITAL_MESSAGE:
-        case SET_DIGITAL_PIN_MODE:
+        case SET_PIN_MODE:
             waitForData = 2; // two data bytes needed
             executeMultiByteCommand = command;
             break;
@@ -231,29 +249,59 @@ void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev)
 
 // Internal Actions/////////////////////////////////////////////////////////////
 
-// analog callback controls
-void FirmataClass::attachAnalogReceive(analogReceiveFunction newFunction)
+// analog callback
+void FirmataClass::attachAnalogReceive(callbackFunction newFunction)
 {
-    currentAnalogReceiveFunction = newFunction;
+    currentAnalogCallback = newFunction;
 }
 void FirmataClass::detachAnalogReceive(void)
 {
-    currentAnalogReceiveFunction = NULL;
+    currentAnalogCallback = NULL;
 }
 
-// digital callback controls
-void FirmataClass::attachDigitalReceive(digitalReceiveFunction newFunction)
+// digital callback
+void FirmataClass::attachDigitalReceive(callbackFunction newFunction)
 {
-    currentDigitalReceiveFunction = newFunction;
+    currentDigitalCallback = newFunction;
 }
-void FirmataClass::detachDigitalReceive(void)
+void FirmataClass::detachDigitalReceive(void) 
 {
-    currentDigitalReceiveFunction = NULL;
+    currentDigitalCallback = NULL;
+}
+
+// report analog callback
+void FirmataClass::attachReportAnalog(callbackFunction newFunction)
+{
+    currentReportAnalogCallback = newFunction;
+}
+void FirmataClass::detachReportAnalog(void)
+{
+    currentReportAnalogCallback = NULL;
+}
+
+// report digital callback
+void FirmataClass::attachReportDigital(callbackFunction newFunction)
+{
+    currentReportDigitalCallback = newFunction;
+}
+void FirmataClass::detachReportDigital(void)
+{
+    currentReportDigitalCallback = NULL;
+}
+
+// report pin mode callback
+void FirmataClass::attachPinMode(callbackFunction newFunction)
+{
+    currentPinModeCallback = newFunction;
+}
+void FirmataClass::detachPinMode(void)
+{
+    currentPinModeCallback = NULL;
 }
 
 /*
  * this is too complicated for analogReceive, but maybe for Sysex?
-void FirmataClass::attachAnalogReceive(analogReceiveFunction newFunction)
+void FirmataClass::attachSysexReceive(sysexFunction newFunction)
 {
     byte i;
     byte tmpCount = analogReceiveFunctionCount;
@@ -298,22 +346,6 @@ void FirmataClass::setPinMode(byte pin, byte mode) {
   // TODO: save status to EEPROM here, if changed
   }
 }
-
-// -----------------------------------------------------------------------------
-/* sets bits in a bit array (int) to toggle the reporting of the analogIns
- */
-void FirmataClass::setAnalogPinReporting(byte pin, byte state) {
-    /*
-    if(state == 0) {
-        analogInputsToReport = analogInputsToReport &~ (1 << pin);
-    }
-    else { // everything but 0 enables reporting of that pin
-        analogInputsToReport = analogInputsToReport | (1 << pin);
-    }
-    */
-    // TODO: save status to EEPROM here, if changed
-}
-
 
 
 // resets the system state upon a SYSTEM_RESET message from the host software
