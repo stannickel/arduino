@@ -50,8 +50,7 @@ extern "C" {
 FirmataClass::FirmataClass(void)
 {
     byte i;
-	// TODO: init serial here
-	// TODO: printVersion
+
     waitForData = 0; // this flag says the next serial input will be data
     executeMultiByteCommand = 0; // execute this after getting multi-byte data
     multiByteChannel = 0; // channel data for multiByteCommands
@@ -59,19 +58,11 @@ FirmataClass::FirmataClass(void)
         storedInputData[i] = 0;
     }
 
-    digitalPinStatus = 65535; // store pin status, default OUTPUT
-/* PWM/analog outputs */
-    pwmStatus = 0; // bitwise array to store PWM status
-
-  for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
-    setPinMode(i,OUTPUT);
-  }
-
-  currentAnalogCallback = NULL;
-  currentDigitalCallback = NULL;
-  currentReportAnalogCallback = NULL;
-  currentReportDigitalCallback = NULL;
-  currentPinModeCallback = NULL;
+    currentAnalogCallback = NULL;
+    currentDigitalCallback = NULL;
+    currentReportAnalogCallback = NULL;
+    currentReportDigitalCallback = NULL;
+    currentPinModeCallback = NULL;
 }
 
 //******************************************************************************
@@ -131,7 +122,7 @@ void FirmataClass::processInput(void)
     int inputData = Serial.read(); // this is 'int' to handle -1 when no data
     int command;
     
-    // a few commands have byte(s) of data following the command
+    // most commands have byte(s) of data following the command
     if( (waitForData > 0) && (inputData < 128) ) {  
         waitForData--;
         storedInputData[waitForData] = inputData;
@@ -139,22 +130,21 @@ void FirmataClass::processInput(void)
             switch(executeMultiByteCommand) {
             case ANALOG_MESSAGE:
                 if(currentAnalogCallback) {
-                    setPinMode(multiByteChannel,PWM);
                     (*currentAnalogCallback)(multiByteChannel,
-                                                    (storedInputData[0] << 7)
-                                                    + storedInputData[1]);
+                                             (storedInputData[0] << 7)
+                                             + storedInputData[1]);
                 }
                 break;
             case DIGITAL_MESSAGE:
                 if(currentDigitalCallback) {
                     (*currentDigitalCallback)(multiByteChannel,
-                                                    (storedInputData[0] << 7)
-                                                    + storedInputData[1]);
+                                              (storedInputData[0] << 7)
+                                              + storedInputData[1]);
                 }
                 break;
             case SET_PIN_MODE:
                 if(currentPinModeCallback)
-                    (*currentPinModeCallback)(multiByteChannel,storedInputData[0]);
+                    (*currentPinModeCallback)(storedInputData[1], storedInputData[0]);
                 break;
             case REPORT_ANALOG_PIN:
                 if(currentReportAnalogCallback)
@@ -301,51 +291,25 @@ void FirmataClass::detachPinMode(void)
 
 /*
  * this is too complicated for analogReceive, but maybe for Sysex?
-void FirmataClass::attachSysexReceive(sysexFunction newFunction)
-{
-    byte i;
-    byte tmpCount = analogReceiveFunctionCount;
-    analogReceiveFunction* tmpArray = analogReceiveFunctionArray;
-    analogReceiveFunctionCount++;
-    analogReceiveFunctionArray = (analogReceiveFunction*) calloc(analogReceiveFunctionCount, sizeof(analogReceiveFunction));
-    for(i = 0; i < tmpCount; i++) {
-        analogReceiveFunctionArray[i] = tmpArray[i];
-    }
-    analogReceiveFunctionArray[tmpCount] = newFunction;
-    free(tmpArray);
-}
+ void FirmataClass::attachSysexReceive(sysexFunction newFunction)
+ {
+ byte i;
+ byte tmpCount = analogReceiveFunctionCount;
+ analogReceiveFunction* tmpArray = analogReceiveFunctionArray;
+ analogReceiveFunctionCount++;
+ analogReceiveFunctionArray = (analogReceiveFunction*) calloc(analogReceiveFunctionCount, sizeof(analogReceiveFunction));
+ for(i = 0; i < tmpCount; i++) {
+ analogReceiveFunctionArray[i] = tmpArray[i];
+ }
+ analogReceiveFunctionArray[tmpCount] = newFunction;
+ free(tmpArray);
+ }
 */
 
 //******************************************************************************
 //* Private Methods
 //******************************************************************************
 
-
-// -----------------------------------------------------------------------------
-/* sets the pin mode to the correct state and sets the relevant bits in the
- * two bit-arrays that track Digital I/O and PWM status
- */
-void FirmataClass::setPinMode(byte pin, byte mode) {
-  if(pin > 1) { // ignore RxTx pins (0,1)
-	if(mode == INPUT) {
-	  digitalPinStatus = digitalPinStatus &~ (1 << pin);
-	  pwmStatus = pwmStatus &~ (1 << pin);
-	  digitalWrite(pin,LOW); // turn off pin before switching to INPUT
-	  pinMode(pin,INPUT);
-	}
-	else if(mode == OUTPUT) {
-	  digitalPinStatus = digitalPinStatus | (1 << pin);
-	  pwmStatus = pwmStatus &~ (1 << pin);
-	  pinMode(pin,OUTPUT);
-	}
-	else if( mode == PWM ) {
-	  digitalPinStatus = digitalPinStatus | (1 << pin);
-	  pwmStatus = pwmStatus | (1 << pin);
-	  pinMode(pin,OUTPUT);
-	}
-  // TODO: save status to EEPROM here, if changed
-  }
-}
 
 
 // resets the system state upon a SYSTEM_RESET message from the host software
