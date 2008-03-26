@@ -49,20 +49,7 @@ extern "C" {
 
 FirmataClass::FirmataClass(void)
 {
-    byte i;
-
-    waitForData = 0; // this flag says the next serial input will be data
-    executeMultiByteCommand = 0; // execute this after getting multi-byte data
-    multiByteChannel = 0; // channel data for multiByteCommands
-    for(i=0; i<MAX_DATA_BYTES; i++) {
-        storedInputData[i] = 0;
-    }
-
-    currentAnalogCallback = NULL;
-    currentDigitalCallback = NULL;
-    currentReportAnalogCallback = NULL;
-    currentReportDigitalCallback = NULL;
-    currentPinModeCallback = NULL;
+    systemReset();
 }
 
 //******************************************************************************
@@ -179,7 +166,7 @@ void FirmataClass::processInput(void)
             executeMultiByteCommand = command;
             break;
         case SYSTEM_RESET:
-            // this doesn't do anything yet
+            systemReset();
             break;
         case REPORT_VERSION:
             Firmata.printVersion();
@@ -238,6 +225,16 @@ void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev)
 
 
 // Internal Actions/////////////////////////////////////////////////////////////
+
+// analog callback
+void FirmataClass::attach(byte command, callbackFunction newFunction)
+{
+    // TODO this should be a big switch() or something better... hmm
+}
+void FirmataClass::detach(byte command)
+{
+    attach(command, NULL);
+}
 
 // analog callback
 void FirmataClass::attachAnalogReceive(callbackFunction newFunction)
@@ -315,8 +312,21 @@ void FirmataClass::detachPinMode(void)
 // resets the system state upon a SYSTEM_RESET message from the host software
 void FirmataClass::systemReset(void)
 {
-    // TODO automatically call this in response to SYSTEM_RESET
-    // TODO reset EEPROM to 0 here
+    byte i;
+
+    waitForData = 0; // this flag says the next serial input will be data
+    executeMultiByteCommand = 0; // execute this after getting multi-byte data
+    multiByteChannel = 0; // channel data for multiByteCommands
+    for(i=0; i<MAX_DATA_BYTES; i++) {
+        storedInputData[i] = 0;
+    }
+
+    currentAnalogCallback = NULL;
+    currentDigitalCallback = NULL;
+    currentReportAnalogCallback = NULL;
+    currentReportDigitalCallback = NULL;
+    currentPinModeCallback = NULL;
+
     // TODO empty serial buffer here
 }
 
@@ -335,6 +345,7 @@ void FirmataClass::pin13strobe(int count, int onInterval, int offInterval)
         digitalWrite(VERSION_BLINK_PIN, LOW);
     }
 }
+
 
 // make one instance for the user to use
 FirmataClass Firmata;
