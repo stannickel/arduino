@@ -54,6 +54,8 @@ public:
 	void sendSysex(byte, byte, byte*);
 // attach & detach functions to messages
 // TODO make general attach & detach functions
+    void attach(byte command, callbackFunction);
+    void detach(byte command);
     void attachAnalogReceive(callbackFunction);
     void detachAnalogReceive(void);
     void attachDigitalReceive(callbackFunction);
@@ -81,8 +83,6 @@ private:
 
 //----------------------------------------
 // private methods
-    void outputDigitalBytes(byte pin0_6, byte pin7_13);
-    void setAnalogPinReporting(byte pin, byte state);
 	void systemReset(void);
     void pin13strobe(int count, int onInterval, int offInterval);
 };
