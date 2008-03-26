@@ -22,8 +22,30 @@
  * installed firmware. */
 #define FIRMATA_MAJOR_VERSION   1 // for non-compatible changes
 #define FIRMATA_MINOR_VERSION   0 // for backwards compatible changes
+#define VERSION_BLINK_PIN               13 // digital pin to blink version on
 
 #define MAX_DATA_BYTES 32 // max number of data bytes in non-Sysex messages
+
+// message command bytes
+#define DIGITAL_MESSAGE         0x90 // send data for a digital pin
+#define ANALOG_MESSAGE          0xE0 // send data for an analog pin (or PWM)
+#define REPORT_ANALOG           0xC0 // enable analog input by pin #
+#define REPORT_DIGITAL          0xD0 // enable digital input by port pair
+//
+#define SET_PIN_MODE            0xF4 // set a pin to INPUT/OUTPUT/PWM/etc
+//
+#define START_SYSEX             0xF0 // start a MIDI Sysex message
+#define END_SYSEX               0xF7 // end a MIDI Sysex message
+//
+#define REPORT_VERSION          0xF9 // report firmware version
+#define SYSTEM_RESET            0xFF // reset from MIDI
+
+
+// for comparing along with INPUT and OUTPUT
+//#define INPUT                 0x00 // defined in wiring.h
+//#define OUTPUT                0x01 // defined in wiring.h
+#define PWM                     0x02
+
 
 extern "C" {
 // callback function types
@@ -35,9 +57,6 @@ class FirmataClass
 {
 public:
 	FirmataClass();
-
-//----------------------------------------
-// methods
 // Arduino constructors
     void begin();
     void begin(long);
@@ -48,24 +67,14 @@ public:
     int available(void);
     void processInput(void);
 // serial send handling
-	void sendAnalog(int, int);
-	void sendDigital(int, int);
-	void sendDigitalPortPair(int, int);
+	void sendAnalog(byte pin, int value);
+	void sendDigital(byte pin, int value);
+	void sendDigitalPortPair(byte port, int value);
 	void sendSysex(byte, byte, byte*);
-// attach & detach functions to messages
-// TODO make general attach & detach functions
+// attach & detach callback functions to messages
     void attach(byte command, callbackFunction);
     void detach(byte command);
-    void attachAnalogReceive(callbackFunction);
-    void detachAnalogReceive(void);
-    void attachDigitalReceive(callbackFunction);
-    void detachDigitalReceive(void);
-    void attachReportAnalog(callbackFunction);
-    void detachReportAnalog(void);
-    void attachReportDigital(callbackFunction);
-    void detachReportDigital(void);
-    void attachPinMode(callbackFunction);
-    void detachPinMode(void);
+
 private:
 /* input message handling */
     byte waitForData; // this flag says the next serial input will be data
@@ -81,8 +90,7 @@ private:
 //    byte sysexReceiveFunctionCount;
 //    sysexReceiveFunction* sysexReceiveFunctionArray;
 
-//----------------------------------------
-// private methods
+// private methods ------------------------------
 	void systemReset(void);
     void pin13strobe(int count, int onInterval, int offInterval);
 };
@@ -106,28 +114,6 @@ extern FirmataClass Firmata;
 #endif
 
 
-// for comparing along with INPUT and OUTPUT
-#define PWM                     2
-
-// for selecting digital inputs
-#define PB  2  // digital input, pins 8-13
-#define PC  3  // analog input port
-#define PD  4  // digital input, pins 0-7
-
-// message command bytes
-#define DIGITAL_MESSAGE         0x90 // send data for a digital pin
-#define ANALOG_MESSAGE          0xE0 // send data for an analog pin (or PWM)
-#define REPORT_ANALOG_PIN       0xC0 // enable analog input by pin #
-#define REPORT_DIGITAL_PORTS    0xD0 // enable digital input by port pair
-//
-#define SET_PIN_MODE            0xF4 // set a pin to INPUT/OUTPUT/PWM/etc
-//
-#define START_SYSEX             0xF0 // start a MIDI Sysex message
-#define END_SYSEX               0xF7 // end a MIDI Sysex message
-//
-#define REPORT_VERSION          0xF9 // report firmware version
-#define SYSTEM_RESET            0xFF // reset from MIDI
-
 // these are used for EEPROM reading and writing
 #define ANALOGINPUTSTOREPORT_LOW_BYTE   0x1F0 // analogInputsToReport is an int
 #define ANALOGINPUTSTOREPORT_HIGH_BYTE  0x1F1 // analogInputsToReport is an int
@@ -136,8 +122,6 @@ extern FirmataClass Firmata;
 #define DIGITALPINSTATUS_HIGH_BYTE      0x1F4 // digitalPinStatus is an int
 #define PWMSTATUS_LOW_BYTE              0x1F5 // pwmStatus is an int
 #define PWMSTATUS_HIGH_BYTE             0x1F6 // pwmStatus is an int
-
-#define VERSION_BLINK_PIN               13 // digital pin to blink version on
 
 
 #endif /* Firmata_h */

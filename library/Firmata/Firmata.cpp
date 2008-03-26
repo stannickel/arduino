@@ -133,11 +133,11 @@ void FirmataClass::processInput(void)
                 if(currentPinModeCallback)
                     (*currentPinModeCallback)(storedInputData[1], storedInputData[0]);
                 break;
-            case REPORT_ANALOG_PIN:
+            case REPORT_ANALOG:
                 if(currentReportAnalogCallback)
                     (*currentReportAnalogCallback)(multiByteChannel,storedInputData[0]);
                 break;
-            case REPORT_DIGITAL_PORTS:
+            case REPORT_DIGITAL:
                 if(currentReportDigitalCallback)
                     (*currentReportDigitalCallback)(multiByteChannel,storedInputData[0]);
                 break;
@@ -160,8 +160,8 @@ void FirmataClass::processInput(void)
             waitForData = 2; // two data bytes needed
             executeMultiByteCommand = command;
             break;
-        case REPORT_ANALOG_PIN:
-        case REPORT_DIGITAL_PORTS:
+        case REPORT_ANALOG:
+        case REPORT_DIGITAL:
             waitForData = 1; // two data bytes needed
             executeMultiByteCommand = command;
             break;
@@ -181,7 +181,7 @@ void FirmataClass::processInput(void)
 // Serial Send Handling
 
 // send an analog message
-void FirmataClass::sendAnalog(int pin, int value) 
+void FirmataClass::sendAnalog(byte pin, int value) 
 {
 	// pin can only be 0-15, so chop higher bits
 	Serial.print(ANALOG_MESSAGE | (pin & 0xF), BYTE);
@@ -190,13 +190,13 @@ void FirmataClass::sendAnalog(int pin, int value)
 }
 
 // send a single digital pin in a digital message
-void FirmataClass::sendDigital(int pin, int value) 
+void FirmataClass::sendDigital(byte pin, int value) 
 {
 	// TODO add single pin digital messages to the  protocol
 }
 
 // send 14-bits in a single digital message
-void FirmataClass::sendDigitalPortPair(int port, int value) 
+void FirmataClass::sendDigitalPortPair(byte port, int value) 
 {
 	// TODO: the digital message should not be sent on the serial port every
 	// time sendDigital() is called.  Instead, it should add it to an int
@@ -209,7 +209,6 @@ void FirmataClass::sendDigitalPortPair(int port, int value)
 	Serial.print(value % 128, BYTE); // Tx pins 0-6
 	Serial.print(value >> 7, BYTE);  // Tx pins 7-13
 }
-
 
 // send a single digital pin in a digital message
 void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev) 
@@ -226,66 +225,24 @@ void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev)
 
 // Internal Actions/////////////////////////////////////////////////////////////
 
-// analog callback
+// generic callbacks
 void FirmataClass::attach(byte command, callbackFunction newFunction)
 {
     // TODO this should be a big switch() or something better... hmm
+    switch(command) {
+    case ANALOG_MESSAGE: currentAnalogCallback = newFunction; break;
+    case DIGITAL_MESSAGE: currentDigitalCallback = newFunction; break;
+    case REPORT_ANALOG: currentReportAnalogCallback = newFunction; break;
+    case REPORT_DIGITAL: currentReportDigitalCallback = newFunction; break;
+    case SET_PIN_MODE:currentPinModeCallback = newFunction; break;
+    }
 }
 void FirmataClass::detach(byte command)
 {
     attach(command, NULL);
 }
 
-// analog callback
-void FirmataClass::attachAnalogReceive(callbackFunction newFunction)
-{
-    currentAnalogCallback = newFunction;
-}
-void FirmataClass::detachAnalogReceive(void)
-{
-    currentAnalogCallback = NULL;
-}
-
-// digital callback
-void FirmataClass::attachDigitalReceive(callbackFunction newFunction)
-{
-    currentDigitalCallback = newFunction;
-}
-void FirmataClass::detachDigitalReceive(void) 
-{
-    currentDigitalCallback = NULL;
-}
-
-// report analog callback
-void FirmataClass::attachReportAnalog(callbackFunction newFunction)
-{
-    currentReportAnalogCallback = newFunction;
-}
-void FirmataClass::detachReportAnalog(void)
-{
-    currentReportAnalogCallback = NULL;
-}
-
-// report digital callback
-void FirmataClass::attachReportDigital(callbackFunction newFunction)
-{
-    currentReportDigitalCallback = newFunction;
-}
-void FirmataClass::detachReportDigital(void)
-{
-    currentReportDigitalCallback = NULL;
-}
-
-// report pin mode callback
-void FirmataClass::attachPinMode(callbackFunction newFunction)
-{
-    currentPinModeCallback = newFunction;
-}
-void FirmataClass::detachPinMode(void)
-{
-    currentPinModeCallback = NULL;
-}
-
+// sysex callbacks
 /*
  * this is too complicated for analogReceive, but maybe for Sysex?
  void FirmataClass::attachSysexReceive(sysexFunction newFunction)
