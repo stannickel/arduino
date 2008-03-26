@@ -143,13 +143,11 @@ void setup()
 {
     byte i;
 
-    Firmata.begin();
-
-    Firmata.attachAnalogReceive(analogWriteCallback);
-    Firmata.attachDigitalReceive(digitalWriteCallback);
-    Firmata.attachReportAnalog(reportAnalogCallback);
-    Firmata.attachReportDigital(reportDigitalCallback);
-    Firmata.attachPinMode(setPinMode);
+    Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
+    Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
+    Firmata.attach(REPORT_ANALOG, reportAnalogCallback);
+    Firmata.attach(REPORT_DIGITAL, reportDigitalCallback);
+    Firmata.attach(SET_PIN_MODE, setPinMode);
 
     for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
         setPinMode(i,OUTPUT);
@@ -159,6 +157,8 @@ void setup()
     /* TODO: send digital inputs here, if enabled, to set the initial state on the
      * host computer, since once in the loop(), the Arduino will only send data on
      * change. */
+
+    Firmata.begin();
 }
 
 /*==============================================================================
