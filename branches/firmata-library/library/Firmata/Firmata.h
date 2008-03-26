@@ -114,15 +114,5 @@ extern FirmataClass Firmata;
 #endif
 
 
-// these are used for EEPROM reading and writing
-#define ANALOGINPUTSTOREPORT_LOW_BYTE   0x1F0 // analogInputsToReport is an int
-#define ANALOGINPUTSTOREPORT_HIGH_BYTE  0x1F1 // analogInputsToReport is an int
-#define REPORTDIGITALINPUTS_BYTE        0x1F2 // 
-#define DIGITALPINSTATUS_LOW_BYTE       0x1F3 // digitalPinStatus is an int
-#define DIGITALPINSTATUS_HIGH_BYTE      0x1F4 // digitalPinStatus is an int
-#define PWMSTATUS_LOW_BYTE              0x1F5 // pwmStatus is an int
-#define PWMSTATUS_HIGH_BYTE             0x1F6 // pwmStatus is an int
-
-
 #endif /* Firmata_h */
 
