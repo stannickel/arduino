@@ -29,9 +29,10 @@
  *============================================================================*/
 
 /* analog inputs */
-int analogInputsToReport = 0xffff; // bitwise array to store pin reporting
+int analogInputsToReport = 0; // bitwise array to store pin reporting
 int analogPin = 0; // counter for reading analog pins
 /* digital pins */
+boolean digitalInputsEnabled = false; // output digital inputs or not
 int digitalInputs;
 int previousDigitalInputs; // previous output to test for change
 /* timer variables */
@@ -47,13 +48,15 @@ unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
  * to the Serial output queue using Serial.print() */
 void checkDigitalInputs(void) 
 {
-    // TODO reimplement report_digital_pins
-    // TODO perhaps ignore pins 0,1 and 14,15 in checking against previous
-    previousDigitalInputs = digitalInputs;
-    digitalInputs = PINB << 8;  // get pins 8-13
-    digitalInputs += PIND;      // get pins 0-7
-    if(digitalInputs != previousDigitalInputs) {
-		Firmata.sendDigitalPortPair(0, digitalInputs); // Arduino pins are in port 0
+    if(digitalInputsEnabled) {
+        // TODO reimplement report_digital_pins
+        // TODO perhaps ignore pins 0,1 and 14,15 in checking against previous
+        previousDigitalInputs = digitalInputs;
+        digitalInputs = PINB << 8;  // get pins 8-13
+        digitalInputs += PIND;      // get pins 0-7
+        if(digitalInputs != previousDigitalInputs) {
+            Firmata.sendDigitalPortPair(0, digitalInputs); // Arduino pins are in port 0
+        }
     }
 }
 
@@ -78,6 +81,30 @@ void digitalWriteCallback(byte port, int value)
     PORTD = (value >> 8 &~ 0xFFC0) | (PORTD &~ 0xC0);   
 }
 
+// -----------------------------------------------------------------------------
+/* sets bits in a bit array (int) to toggle the reporting of the analogIns
+ */
+//void FirmataClass::setAnalogPinReporting(byte pin, byte state) {
+//}
+void reportAnalogCallback(byte pin, int value)
+{
+    if(value == 0) {
+        analogInputsToReport = analogInputsToReport &~ (1 << pin);
+    }
+    else { // everything but 0 enables reporting of that pin
+        analogInputsToReport = analogInputsToReport | (1 << pin);
+    }
+    // TODO: save status to EEPROM here, if changed
+}
+
+void reportDigitalCallback(byte port, int value)
+{
+// TODO: implement MIDI channel as port base for more than 16 digital inputs
+    if(value == 0)
+        digitalInputsEnabled = false;
+    else
+        digitalInputsEnabled = true;
+}
 
 /*==============================================================================
  * SETUP()
@@ -87,7 +114,9 @@ void setup()
     Firmata.begin();
 
     Firmata.attachAnalogReceive(analogWriteCallback);
-//    Firmata.attachDigitalReceive(digitalWriteCallback);
+    Firmata.attachDigitalReceive(digitalWriteCallback);
+    Firmata.attachReportAnalog(reportAnalogCallback);
+    Firmata.attachReportDigital(reportDigitalCallback);
 
     // TODO: load state from EEPROM here
 
