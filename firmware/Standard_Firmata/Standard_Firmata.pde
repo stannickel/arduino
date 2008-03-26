@@ -35,6 +35,9 @@ int analogPin = 0; // counter for reading analog pins
 boolean digitalInputsEnabled = false; // output digital inputs or not
 int digitalInputs;
 int previousDigitalInputs; // previous output to test for change
+int digitalPinStatus = 65535; // store pin status, default OUTPUT
+/* PWM/analog outputs */
+int pwmStatus = 0; // bitwise array to store PWM status, default off
 /* timer variables */
 extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
 unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
@@ -60,8 +63,35 @@ void checkDigitalInputs(void)
     }
 }
 
+// -----------------------------------------------------------------------------
+/* sets the pin mode to the correct state and sets the relevant bits in the
+ * two bit-arrays that track Digital I/O and PWM status
+ */
+void setPinMode(byte pin, int mode) {
+  if(pin > 1) { // ignore RxTx pins (0,1)
+	if(mode == INPUT) {
+	  digitalPinStatus = digitalPinStatus &~ (1 << pin);
+	  pwmStatus = pwmStatus &~ (1 << pin);
+	  digitalWrite(pin,LOW); // turn off pin before switching to INPUT
+	  pinMode(pin,INPUT);
+	}
+	else if(mode == OUTPUT) {
+	  digitalPinStatus = digitalPinStatus | (1 << pin);
+	  pwmStatus = pwmStatus &~ (1 << pin);
+	  pinMode(pin,OUTPUT);
+	}
+	else if( mode == PWM ) {
+	  digitalPinStatus = digitalPinStatus | (1 << pin);
+	  pwmStatus = pwmStatus | (1 << pin);
+	  pinMode(pin,OUTPUT);
+	}
+  // TODO: save status to EEPROM here, if changed
+  }
+}
+
 void analogWriteCallback(byte pin, int value)
 {
+    setPinMode(pin,PWM);
     analogWrite(pin, value);
 }
 
@@ -111,13 +141,19 @@ void reportDigitalCallback(byte port, int value)
  *============================================================================*/
 void setup() 
 {
+    byte i;
+
     Firmata.begin();
 
     Firmata.attachAnalogReceive(analogWriteCallback);
     Firmata.attachDigitalReceive(digitalWriteCallback);
     Firmata.attachReportAnalog(reportAnalogCallback);
     Firmata.attachReportDigital(reportDigitalCallback);
+    Firmata.attachPinMode(setPinMode);
 
+    for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
+        setPinMode(i,OUTPUT);
+    }
     // TODO: load state from EEPROM here
 
     /* TODO: send digital inputs here, if enabled, to set the initial state on the

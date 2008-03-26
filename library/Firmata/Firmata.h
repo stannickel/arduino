@@ -70,10 +70,6 @@ private:
     byte executeMultiByteCommand; // execute this after getting multi-byte data
     byte multiByteChannel; // channel data for multiByteCommands
     byte storedInputData[MAX_DATA_BYTES]; // multi-byte data
-/* digital pins */
-    unsigned int digitalPinStatus; // store pin status, default OUTPUT
-/* PWM/analog outputs */
-    int pwmStatus; // bitwise array to store PWM status
 /* argc/argv pairs for callback functions */
     callbackFunction currentAnalogCallback;
     callbackFunction currentDigitalCallback;
@@ -86,7 +82,6 @@ private:
 //----------------------------------------
 // private methods
     void outputDigitalBytes(byte pin0_6, byte pin7_13);
-    void setPinMode(byte pin, byte mode);
     void setAnalogPinReporting(byte pin, byte state);
 	void systemReset(void);
     void pin13strobe(int count, int onInterval, int offInterval);
