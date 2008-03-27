@@ -64,13 +64,11 @@ unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
 void checkDigitalInputs(void) 
 {
     if(digitalInputsEnabled) {
-        // TODO reimplement report_digital_pins
-        // TODO perhaps ignore pins 0,1 and 14,15 in checking against previous
         previousDigitalInputs = digitalInputs;
-        digitalInputs = PINB << 8;  // get pins 8-13
-        digitalInputs += PIND;      // get pins 0-7
+        digitalInputs = PINB << 8; // pins 8-13 (14,15 for crystal are disabled)
+        digitalInputs = digitalInputs + (PIND &~ B00000011);//pins 2-7, ignore 0,1
         if(digitalInputs != previousDigitalInputs) {
-            Firmata.sendDigitalPortPair(0, digitalInputs); // Arduino pins are in port 0
+            Firmata.sendDigitalPortPair(0, digitalInputs);
         }
     }
 }
@@ -141,7 +139,6 @@ void reportAnalogCallback(byte pin, int value)
 
 void reportDigitalCallback(byte port, int value)
 {
-// TODO: implement MIDI channel as port base for more than 16 digital inputs
     if(value == 0)
         digitalInputsEnabled = false;
     else
