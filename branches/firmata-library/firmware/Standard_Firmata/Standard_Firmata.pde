@@ -54,6 +54,7 @@ int pwmStatus = 0; // bitwise array to store PWM status, default off
 extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
 unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
 
+
 /*==============================================================================
  * FUNCTIONS                                                                
  *============================================================================*/
@@ -116,9 +117,10 @@ void digitalWriteCallback(byte port, int value)
 // 0xFF03 == B1111111100000011    0x03 == B00000011
     PORTD = (value &~ 0xFF03) | (PORTD & 0x03);
     
-//pins 8-13 (14,15 are for the crystal, don't change their values)
-// 0xffc0 == B1111111111000000    0xc0 == B11000000
-    PORTB = ((value >> 8) &~ 0xFFC0) | (PORTB & 0xC0);   
+//pins 8-13 (14,15 are disabled for the crystal) 
+// 0xFFC0 == B1111111111000000
+    PORTB = (value >> 8) &~ 0xFFC0;
+    
 }
 
 // -----------------------------------------------------------------------------
