@@ -25,18 +25,12 @@ extern "C" {
     // AVR LibC Includes
 #include <inttypes.h>
 #include <stdlib.h>
-
-    // use the abs in WConstants.h, not the one in stdlib.h
-#undef abs
-  
-    // Wiring Core Includes
-#include "WConstants.h"
+#include <string.h>
+#include "wiring.h"
 }
 
-
-#include "Firmata.h"
-#include "EEPROM.h"
 #include "HardwareSerial.h"
+#include "Firmata.h"
 
 
 //******************************************************************************
@@ -49,6 +43,9 @@ extern "C" {
 
 FirmataClass::FirmataClass(void)
 {
+    strcpy(firmwareName, "UNSET");
+    majorVersion = 127;
+    minorVersion = 127;
     systemReset();
 }
 
@@ -72,6 +69,7 @@ void FirmataClass::begin(long speed)
     Serial.begin(speed);
     delay(300);
     printVersion();
+    printFirmwareVersion();
 }
 
 // output the protocol version message to the serial port
@@ -96,6 +94,28 @@ void FirmataClass::blinkVersion(void)
     pin13strobe(2,1,4); // separator, a quick burst
 }
 
+void FirmataClass::printFirmwareVersion(void)
+{
+    byte bytec = 0;
+    byte bytev[MAX_DATA_BYTES];
+    // TODO set this up to be (byte major, byte minor, char* name) 
+    if(firmwareName) // make sure that the name has been set before reporting
+    {
+        bytev[0] = minorVersion; bytec++;
+        bytev[1] = majorVersion; bytec++;
+        strncpy((char*)bytev + 2, firmwareName, MAX_DATA_BYTES);
+        bytec += strlen(firmwareName);
+        Firmata.sendSysex(REPORT_FIRMWARE, bytec, bytev);
+    }
+}
+
+void FirmataClass::setFirmwareVersion(char *name, byte major, byte minor)
+{
+    majorVersion = major;
+    minorVersion = minor;
+    strncpy(firmwareName, name, MAX_DATA_BYTES);
+}
+
 //------------------------------------------------------------------------------
 // Serial Receive Handling
 
@@ -104,13 +124,68 @@ int FirmataClass::available(void)
     return Serial.available();
 }
 
+
+void FirmataClass::processSysexMessage(void)
+{
+    switch(storedInputData[0]) { //first byte in buffer is command
+/*
+    case SYSEX_SERVO_ATTACH:
+        if(sysExBytesRead==2) {//sanity check
+            byte pin = storedInputData[1];
+            if(pin==9 || pin==10) { 
+                servos[pin-9].attach(pin);
+            }
+        }
+        //servos[storedInputData[1]-9].attach(storedInputData[1]);
+        break;
+    case SYSEX_SERVO_DETACH:
+        if(sysExBytesRead==2) {//sanity check
+            byte pin = storedInputData[1];
+            if(pin==9 || pin==10) { 
+                servos[pin-9].detach();
+            } 
+        }
+        break;
+    case SYSEX_SERVO_SETMINPULSE:
+        if(sysExBytesRead==4) {//sanity check
+            byte pin = storedInputData[1];
+            if(pin==9 || pin==10) { 
+                servos[pin-9].setMinimumPulse((storedInputData[3]  << 7) + storedInputData[2]);
+            } 
+        }
+        break;
+    case SYSEX_SERVO_SETMAXPULSE:
+        if(sysExBytesRead==4) {//sanity check
+            byte pin = storedInputData[1];
+            if(pin==9 || pin==10) { 
+                servos[pin-9].setMaximumPulse((storedInputData[3]  << 7) + storedInputData[2]);
+            } 
+        }
+        break;
+*/
+    case REPORT_FIRMWARE:
+        printFirmwareVersion();
+        break;
+    }
+}
+
 void FirmataClass::processInput(void)
 {
     int inputData = Serial.read(); // this is 'int' to handle -1 when no data
     int command;
     
-    // most commands have byte(s) of data following the command
-    if( (waitForData > 0) && (inputData < 128) ) {  
+    if (parsingSysex) {
+        if(inputData == END_SYSEX) {
+            //stop sysex byte      
+            parsingSysex = false;
+            //fire off handler function
+            processSysexMessage();
+        } else {
+            //normal data byte - add to buffer
+            storedInputData[sysexBytesRead] = inputData;
+            sysexBytesRead++;
+        }
+    } else if( (waitForData > 0) && (inputData < 128) ) {  
         waitForData--;
         storedInputData[waitForData] = inputData;
         if( (waitForData==0) && executeMultiByteCommand ) { // got the whole message
@@ -153,7 +228,7 @@ void FirmataClass::processInput(void)
             command = inputData;
             // commands in the 0xF* range don't use channel data
         }
-        switch (command) { // TODO: these needs to be switched to command
+        switch (command) {
         case ANALOG_MESSAGE:
         case DIGITAL_MESSAGE:
         case SET_PIN_MODE:
@@ -165,6 +240,10 @@ void FirmataClass::processInput(void)
             waitForData = 1; // two data bytes needed
             executeMultiByteCommand = command;
             break;
+        case START_SYSEX:
+            parsingSysex = true;
+            sysexBytesRead = 0;
+            break;
         case SYSTEM_RESET:
             systemReset();
             break;
@@ -174,8 +253,6 @@ void FirmataClass::processInput(void)
         }
     }
 }
-
-
 
 //------------------------------------------------------------------------------
 // Serial Send Handling
@@ -192,10 +269,20 @@ void FirmataClass::sendAnalog(byte pin, int value)
 // send a single digital pin in a digital message
 void FirmataClass::sendDigital(byte pin, int value) 
 {
-	// TODO add single pin digital messages to the  protocol
+	/* TODO add single pin digital messages to the protocol, this needs to
+     * track the last digital data sent so that it can be sure to change just
+     * one bit in the packet.  This is complicated by the fact that the
+     * numbering of the pins will probably differ on Arduino, Wiring, and
+     * other boards.  The DIGITAL_MESSAGE sends 14 bits at a time, but it is
+     * probably easier to send 8 bit ports for any board with more than 14
+     * digital pins.
+     */
+
+//    if(value == 0)
+//        sendDigitalPortPair();
 }
 
-// send 14-bits in a single digital message
+// send 14-bits in a single digital message (protocol v1)
 void FirmataClass::sendDigitalPortPair(byte port, int value) 
 {
 	// TODO: the digital message should not be sent on the serial port every
@@ -210,7 +297,14 @@ void FirmataClass::sendDigitalPortPair(byte port, int value)
 	Serial.print(value >> 7, BYTE);  // Tx pins 7-13
 }
 
-// send a single digital pin in a digital message
+/*
+// send an 8-bit port in a single digital message (protocol v2)
+void Firmata::sendDigitalPort(byte port, byte firstPort, byte secondPort)
+{
+    //TODO implement
+}
+*/
+
 void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev) 
 {
     byte i;
@@ -222,21 +316,34 @@ void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev)
     Serial.print(END_SYSEX, BYTE);
 }
 
+void FirmataClass::sendString(byte command, const char* string) 
+{
+    // TODO send 7-bits at a time so that 8-bit ASCII is supported
+    sendSysex(command, strlen(string), (byte *)string);
+}
+
+
+// send a string as the protocol string type
+void FirmataClass::sendString(const char* string) 
+{
+    sendString(SYSEX_STRING, string);
+}
+
 
 // Internal Actions/////////////////////////////////////////////////////////////
 
 // generic callbacks
 void FirmataClass::attach(byte command, callbackFunction newFunction)
 {
-    // TODO this should be a big switch() or something better... hmm
     switch(command) {
     case ANALOG_MESSAGE: currentAnalogCallback = newFunction; break;
     case DIGITAL_MESSAGE: currentDigitalCallback = newFunction; break;
     case REPORT_ANALOG: currentReportAnalogCallback = newFunction; break;
     case REPORT_DIGITAL: currentReportDigitalCallback = newFunction; break;
-    case SET_PIN_MODE:currentPinModeCallback = newFunction; break;
+    case SET_PIN_MODE: currentPinModeCallback = newFunction; break;
     }
 }
+
 void FirmataClass::detach(byte command)
 {
     attach(command, NULL);
@@ -245,7 +352,7 @@ void FirmataClass::detach(byte command)
 // sysex callbacks
 /*
  * this is too complicated for analogReceive, but maybe for Sysex?
- void FirmataClass::attachSysexReceive(sysexFunction newFunction)
+ void FirmataClass::attachSysex(sysexFunction newFunction)
  {
  byte i;
  byte tmpCount = analogReceiveFunctionCount;
@@ -274,6 +381,8 @@ void FirmataClass::systemReset(void)
     waitForData = 0; // this flag says the next serial input will be data
     executeMultiByteCommand = 0; // execute this after getting multi-byte data
     multiByteChannel = 0; // channel data for multiByteCommands
+
+
     for(i=0; i<MAX_DATA_BYTES; i++) {
         storedInputData[i] = 0;
     }
@@ -283,6 +392,11 @@ void FirmataClass::systemReset(void)
     currentReportAnalogCallback = NULL;
     currentReportDigitalCallback = NULL;
     currentPinModeCallback = NULL;
+
+    //sysexCallbackCount = 0;
+    //sysexCallbackArray = NULL;
+    parsingSysex = false;
+    sysexBytesRead = 0;
 
     // TODO empty serial buffer here
 }
