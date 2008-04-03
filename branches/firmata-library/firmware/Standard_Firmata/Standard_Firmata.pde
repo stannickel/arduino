@@ -154,6 +154,8 @@ void setup()
 {
     byte i;
 
+    Firmata.setFirmwareVersion("Standard_Firmata", 2, 0);
+
     Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
     Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
     Firmata.attach(REPORT_ANALOG, reportAnalogCallback);

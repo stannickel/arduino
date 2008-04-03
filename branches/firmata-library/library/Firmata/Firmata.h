@@ -22,11 +22,11 @@
  * installed firmware. */
 #define FIRMATA_MAJOR_VERSION   1 // for non-compatible changes
 #define FIRMATA_MINOR_VERSION   0 // for backwards compatible changes
-#define VERSION_BLINK_PIN               13 // digital pin to blink version on
+#define VERSION_BLINK_PIN       13 // digital pin to blink version on
 
 #define MAX_DATA_BYTES 32 // max number of data bytes in non-Sysex messages
 
-// message command bytes
+// message command bytes (128-255/0x80-0xff)
 #define DIGITAL_MESSAGE         0x90 // send data for a digital pin
 #define ANALOG_MESSAGE          0xE0 // send data for an analog pin (or PWM)
 #define REPORT_ANALOG           0xC0 // enable analog input by pin #
@@ -34,11 +34,19 @@
 //
 #define SET_PIN_MODE            0xF4 // set a pin to INPUT/OUTPUT/PWM/etc
 //
+#define REPORT_VERSION          0xF9 // report protocol version
+#define SYSTEM_RESET            0xFF // reset from MIDI
+//
 #define START_SYSEX             0xF0 // start a MIDI Sysex message
 #define END_SYSEX               0xF7 // end a MIDI Sysex message
-//
-#define REPORT_VERSION          0xF9 // report firmware version
-#define SYSTEM_RESET            0xFF // reset from MIDI
+
+// extended command set using sysex (0-127/0x00-0x7f)
+#define SYSEX_SERVO_CONFIG      0x70 // set max angle, minPulse, maxPulse, freq
+#define SYSEX_STRING            0x71 // set a string via sysex
+#define REPORT_FIRMWARE         0x79 // report name and version of the firmware
+#define SYSEX_NON_REALTIME      0x7E // MIDI Reserved for non-realtime messages
+#define SYSEX_REALTIME          0x7F // MIDI Reserved for realtime messages
+
 
 
 // for comparing along with INPUT and OUTPUT
@@ -50,7 +58,7 @@
 extern "C" {
 // callback function types
     typedef void (*callbackFunction)(byte, int);
-//    typedef void (*sysexReceiveFunction)(byte, byte, byte*);
+    typedef void (*sysexCallbackFunction)(byte, byte, byte*);
 }
 
 class FirmataClass
@@ -63,6 +71,8 @@ public:
 // querying functions
 	void printVersion(void);
     void blinkVersion(void);
+    void printFirmwareVersion(void);
+    void setFirmwareVersion(char *name, byte major, byte minor);
 // serial receive handling
     int available(void);
     void processInput(void);
@@ -70,27 +80,40 @@ public:
 	void sendAnalog(byte pin, int value);
 	void sendDigital(byte pin, int value);
 	void sendDigitalPortPair(byte port, int value);
-	void sendSysex(byte, byte, byte*);
+	void sendDigitalPorts(byte port, byte firstPort, byte secondPort);
+    void sendString(const char* string);
+    void sendString(byte command, const char* string);
+	void sendSysex(byte command, byte bytec, byte* bytev);
 // attach & detach callback functions to messages
-    void attach(byte command, callbackFunction);
+    void attach(byte command, callbackFunction newFunction);
     void detach(byte command);
+// void flush()  // TODO implement flush
 
 private:
+/* firmware name and version */
+    byte majorVersion;
+    byte minorVersion;
+    char firmwareName[MAX_DATA_BYTES];
 /* input message handling */
     byte waitForData; // this flag says the next serial input will be data
     byte executeMultiByteCommand; // execute this after getting multi-byte data
     byte multiByteChannel; // channel data for multiByteCommands
     byte storedInputData[MAX_DATA_BYTES]; // multi-byte data
+/* sysex */
+    boolean parsingSysex;
+    int sysexBytesRead;
 /* argc/argv pairs for callback functions */
     callbackFunction currentAnalogCallback;
     callbackFunction currentDigitalCallback;
     callbackFunction currentReportAnalogCallback;
     callbackFunction currentReportDigitalCallback;
     callbackFunction currentPinModeCallback;
-//    byte sysexReceiveFunctionCount;
-//    sysexReceiveFunction* sysexReceiveFunctionArray;
+    sysexCallbackFunction currentSysexCallback;
+//    byte sysexCallbackCount;
+//    sysexCallbackFunction* sysexCallbackArray;
 
 // private methods ------------------------------
+    void processSysexMessage(void);
 	void systemReset(void);
     void pin13strobe(int count, int onInterval, int offInterval);
 };
