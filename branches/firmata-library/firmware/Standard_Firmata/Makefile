@@ -46,7 +46,7 @@
 # $Id: Makefile,v 1.7 2007/04/13 05:28:23 eighthave Exp $
 
 PORT = /dev/tty.usbserial-*
-TARGET = Standard_Firmata
+TARGET = $(shell pwd | sed 's|.*/\(.*\)|\1|')
 ARDUINO = /Applications/arduino-0011
 ARDUINO_SRC = $(ARDUINO)/hardware/cores/arduino
 ARDUINO_LIB_SRC = $(ARDUINO)/hardware/libraries
