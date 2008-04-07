@@ -12,6 +12,9 @@
 /* This firmware supports as many analog ports as possible, all analog inputs,
  * six PWM outputs, and the other six remaining digital pins are set up with
  * servo support.
+ *
+ * The "Servo" library from http://www.arduino.cc/playground/ComponentLib/Servo
+ * is required.
  */
 #include <Firmata.h>
 #include <Servo.h>
@@ -23,6 +26,7 @@
 /* servos */
 Servo servo2, servo4, servo7, servo8, servo12, servo13; // one instance per pin
 /* analog inputs */
+int analogInputsToReport = 0; // bitwise array to store pin reporting
 int analogPin = 0; // counter for reading analog pins
 /* timer variables */
 extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
@@ -52,6 +56,18 @@ void analogWriteCallback(byte pin, int value)
         break;
     }
 }
+// -----------------------------------------------------------------------------
+// sets bits in a bit array (int) to toggle the reporting of the analogIns
+void reportAnalogCallback(byte pin, int value)
+{
+    if(value == 0) {
+        analogInputsToReport = analogInputsToReport &~ (1 << pin);
+    }
+    else { // everything but 0 enables reporting of that pin
+        analogInputsToReport = analogInputsToReport | (1 << pin);
+    }
+    // TODO: save status to EEPROM here, if changed
+}
 
 /*==============================================================================
  * SETUP()
@@ -62,6 +78,7 @@ void setup()
 
     Firmata.setFirmwareVersion(__FILE__, 2, 0);
     Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
+    Firmata.attach(REPORT_ANALOG, reportAnalogCallback);
 
     for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
         pinMode(i,OUTPUT);
@@ -87,7 +104,8 @@ void loop()
         nextExecuteTime = timer0_overflow_count + 19; // run this every 20ms
         Servo::refresh();
         for(analogPin=0;analogPin<TOTAL_ANALOG_PINS;analogPin++) {
-            Firmata.sendAnalog(analogPin, analogRead(analogPin));
+            if( analogInputsToReport & (1 << analogPin) ) 
+                Firmata.sendAnalog(analogPin, analogRead(analogPin));
         }
     }
 }
