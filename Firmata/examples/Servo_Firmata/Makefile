@@ -47,7 +47,7 @@
 
 PORT = /dev/tty.usbserial-*
 TARGET := $(shell pwd | sed 's|.*/\(.*\)|\1|')
-ARDUINO = /Applications/arduino-0011
+ARDUINO = /Applications/arduino
 ARDUINO_SRC = $(ARDUINO)/hardware/cores/arduino
 ARDUINO_LIB_SRC = $(ARDUINO)/hardware/libraries
 INCLUDE = -I$(ARDUINO_SRC) -I$(ARDUINO)/hardware/tools/avr/avr/include \
