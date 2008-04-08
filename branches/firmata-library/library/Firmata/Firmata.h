@@ -61,39 +61,40 @@ extern "C" {
     typedef void (*sysexCallbackFunction)(byte, byte, byte*);
 }
 
+
 class FirmataClass
 {
 public:
 	FirmataClass();
-// Arduino constructors
+/* Arduino constructors */
     void begin();
     void begin(long);
-// querying functions
+/* querying functions */
 	void printVersion(void);
     void blinkVersion(void);
     void printFirmwareVersion(void);
-    void setFirmwareVersion(char *name, byte major, byte minor);
-// serial receive handling
+//  void setFirmwareVersion(byte major, byte minor);  // see macro below
+    void setFirmwareNameAndVersion(const char *name, byte major, byte minor);
+/* serial receive handling */
     int available(void);
     void processInput(void);
-// serial send handling
+/* serial send handling */
 	void sendAnalog(byte pin, int value);
 	void sendDigital(byte pin, int value);
 	void sendDigitalPortPair(byte port, int value);
-	void sendDigitalPorts(byte port, byte firstPort, byte secondPort);
+	void sendDigitalPort(byte portNumber, byte portData);
     void sendString(const char* string);
     void sendString(byte command, const char* string);
 	void sendSysex(byte command, byte bytec, byte* bytev);
-// attach & detach callback functions to messages
+/* attach & detach callback functions to messages */
     void attach(byte command, callbackFunction newFunction);
     void detach(byte command);
 // void flush()  // TODO implement flush
 
 private:
 /* firmware name and version */
-    byte majorVersion;
-    byte minorVersion;
-    char firmwareName[MAX_DATA_BYTES];
+    byte firmwareVersionCount;
+    byte *firmwareVersionVector;
 /* input message handling */
     byte waitForData; // this flag says the next serial input will be data
     byte executeMultiByteCommand; // execute this after getting multi-byte data
@@ -112,7 +113,7 @@ private:
 //    byte sysexCallbackCount;
 //    sysexCallbackFunction* sysexCallbackArray;
 
-// private methods ------------------------------
+/* private methods ------------------------------ */
     void processSysexMessage(void);
 	void systemReset(void);
     void pin13strobe(int count, int onInterval, int offInterval);
@@ -123,6 +124,13 @@ extern FirmataClass Firmata;
 /*==============================================================================
  * MACROS
  *============================================================================*/
+
+/* shortcut for setFirmwareNameAndVersion() that uses __FILE__ to set the
+ * firmware name.  It needs to be a macro so that __FILE__ is included in the
+ * firmware source file rather than the library source file.
+ */
+#define setFirmwareVersion(x, y)   setFirmwareNameAndVersion(__FILE__, x, y)
+
 
 // total number of pins currently supported
 #if defined(__AVR_ATmega168__) // Arduino NG and Diecimila
@@ -135,6 +143,7 @@ extern FirmataClass Firmata;
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      43
 #endif
+
 
 
 #endif /* Firmata_h */

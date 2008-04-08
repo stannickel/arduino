@@ -17,25 +17,46 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+/*
+ * TODO generalized SysEx support
+ * TODO firmware name/version reporting (i.e. some firmwares will use the Firmata
+ *       protocol, but will only support specific devices, like ultrasound 
+ *       rangefinders or servos)
+ * TODO implement v2 protocol using digital ports
+ */
+
 //******************************************************************************
 //* Includes
 //******************************************************************************
 
-extern "C" {
-    // AVR LibC Includes
-#include <inttypes.h>
-#include <stdlib.h>
-#include <string.h>
-#include "wiring.h"
-}
-
+#include "WProgram.h"
 #include "HardwareSerial.h"
 #include "Firmata.h"
 
+extern "C" {
+#include <string.h>
+#include <stdlib.h>
+}
 
 //******************************************************************************
-//* Definitions
+//* Support Functions
 //******************************************************************************
+
+void sendValueAsTwo7bitBytes(int value)
+{
+	Serial.print(value & B01111111, BYTE); // LSB
+	Serial.print(value >> 7 & B01111111, BYTE); // MSB
+}
+
+void startSysex(void)
+{
+    Serial.print(START_SYSEX, BYTE);
+}
+
+void endSysex(void)
+{
+    Serial.print(END_SYSEX, BYTE);
+}
 
 //******************************************************************************
 //* Constructors
@@ -43,9 +64,7 @@ extern "C" {
 
 FirmataClass::FirmataClass(void)
 {
-    strcpy(firmwareName, "UNSET");
-    majorVersion = 127;
-    minorVersion = 127;
+    firmwareVersionCount = 0;
     systemReset();
 }
 
@@ -66,7 +85,11 @@ void FirmataClass::begin(void)
 void FirmataClass::begin(long speed)
 {
     blinkVersion();
+#if defined(__AVR_ATmega128__)  // Wiring
+    Serial.begin((uint32_t)speed);
+#else
     Serial.begin(speed);
+#endif
     delay(300);
     printVersion();
     printFirmwareVersion();
@@ -96,24 +119,45 @@ void FirmataClass::blinkVersion(void)
 
 void FirmataClass::printFirmwareVersion(void)
 {
-    byte bytec = 0;
-    byte bytev[MAX_DATA_BYTES];
-    // TODO set this up to be (byte major, byte minor, char* name) 
-    if(firmwareName) // make sure that the name has been set before reporting
-    {
-        bytev[0] = minorVersion; bytec++;
-        bytev[1] = majorVersion; bytec++;
-        strncpy((char*)bytev + 2, firmwareName, MAX_DATA_BYTES);
-        bytec += strlen(firmwareName);
-        Firmata.sendSysex(REPORT_FIRMWARE, bytec, bytev);
+    byte i;
+
+    if(firmwareVersionCount) { // make sure that the name has been set before reporting
+        startSysex();
+        Serial.print(REPORT_FIRMWARE, BYTE);
+        Serial.print(firmwareVersionVector[0]); // major version number
+        Serial.print(firmwareVersionVector[1]); // minor version number
+        for(i=2; i<firmwareVersionCount; ++i) {
+            sendValueAsTwo7bitBytes(firmwareVersionVector[i]);
+        }
+        endSysex();
     }
 }
 
-void FirmataClass::setFirmwareVersion(char *name, byte major, byte minor)
+void FirmataClass::setFirmwareNameAndVersion(const char *name, byte major, byte minor)
 {
-    majorVersion = major;
-    minorVersion = minor;
-    strncpy(firmwareName, name, MAX_DATA_BYTES);
+    const char *filename;
+    char *extension;
+    byte byteCount = strlen(name) + 2;
+
+
+// parse out ".cpp" and "applet/" that comes from using __FILE__
+    extension = strstr(name, ".cpp");
+    filename = strrchr(name, '/') + 1; //points to slash, +1 gets to start of filename
+    // add two bytes for version numbers
+    if(extension && filename) {
+        firmwareVersionCount = extension - filename + 2;
+    } else {
+        firmwareVersionCount = strlen(name) + 2;
+        filename = name;
+    }
+    firmwareVersionVector = (byte *) malloc(firmwareVersionCount);
+    firmwareVersionVector[firmwareVersionCount] = 0;
+    firmwareVersionVector[0] = major;
+    firmwareVersionVector[1] = minor;
+    strncpy((char*)firmwareVersionVector + 2, filename, firmwareVersionCount - 2);
+// alas, no snprintf on Arduino
+//    snprintf(firmwareVersionVector, MAX_DATA_BYTES, "%c%c%s", 
+//             (char)major, (char)minor, firmwareVersionVector);
 }
 
 //------------------------------------------------------------------------------
@@ -262,8 +306,7 @@ void FirmataClass::sendAnalog(byte pin, int value)
 {
 	// pin can only be 0-15, so chop higher bits
 	Serial.print(ANALOG_MESSAGE | (pin & 0xF), BYTE);
-	Serial.print(value % 128, BYTE);
-	Serial.print(value >> 7, BYTE); 
+    sendValueAsTwo7bitBytes(value);
 }
 
 // send a single digital pin in a digital message
@@ -297,28 +340,27 @@ void FirmataClass::sendDigitalPortPair(byte port, int value)
 	Serial.print(value >> 7, BYTE);  // Tx pins 7-13
 }
 
-/*
+
 // send an 8-bit port in a single digital message (protocol v2)
-void Firmata::sendDigitalPort(byte port, byte firstPort, byte secondPort)
+void FirmataClass::sendDigitalPort(byte portNumber, byte portData)
 {
     //TODO implement
 }
-*/
+
 
 void FirmataClass::sendSysex(byte command, byte bytec, byte* bytev) 
 {
     byte i;
-    Serial.print(START_SYSEX, BYTE);
+    startSysex();
     Serial.print(command, BYTE);
     for(i=0; i<bytec; i++) {
-        Serial.print(bytev[i], BYTE);        
+        sendValueAsTwo7bitBytes(bytev[i]);        
     }
-    Serial.print(END_SYSEX, BYTE);
+    endSysex();
 }
 
 void FirmataClass::sendString(byte command, const char* string) 
 {
-    // TODO send 7-bits at a time so that 8-bit ASCII is supported
     sendSysex(command, strlen(string), (byte *)string);
 }
 
@@ -420,3 +462,5 @@ void FirmataClass::pin13strobe(int count, int onInterval, int offInterval)
 
 // make one instance for the user to use
 FirmataClass Firmata;
+
+

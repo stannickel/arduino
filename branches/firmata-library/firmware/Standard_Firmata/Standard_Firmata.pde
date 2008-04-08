@@ -10,13 +10,9 @@
  */
 
 /* 
- * TODO: generalized SysEx support
  * TODO: Bjoen Servo support
  * TODO: pulseOut functionality for servos
  * TODO: software PWM for servos, etc (servo.h or pulse.h)
- * TODO: firmware name/version reporting (i.e. some firmwares will use the Firmata
- *       protocol, but will only support specific devices, like ultrasound 
- *       rangefinders or servos)
  * TODO: use Program Control to load stored profiles from EEPROM
  */
 
@@ -154,7 +150,7 @@ void setup()
 {
     byte i;
 
-    Firmata.setFirmwareVersion("Standard_Firmata", 2, 0);
+    Firmata.setFirmwareVersion(2, 0);
 
     Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
     Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
