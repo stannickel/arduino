@@ -10,9 +10,7 @@
  */
 
 /* 
- * TODO: Bjoen Servo support
- * TODO: pulseOut functionality for servos
- * TODO: software PWM for servos, etc (servo.h or pulse.h)
+ * TODO: add Servo support using setPinMode(pin, SERVO);
  * TODO: use Program Control to load stored profiles from EEPROM
  */
 
