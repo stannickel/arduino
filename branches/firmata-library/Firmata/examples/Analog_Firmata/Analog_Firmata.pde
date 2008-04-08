@@ -15,6 +15,8 @@
  *
  * The "Servo" library from http://www.arduino.cc/playground/ComponentLib/Servo
  * is required.
+ *
+ * Written by Hans-Christoph Steiner <hans@eds.org>
  */
 #include <Firmata.h>
 #include <Servo.h>
@@ -76,7 +78,7 @@ void setup()
 {
     byte i;
 
-    Firmata.setFirmwareVersion(__FILE__, 2, 0);
+    Firmata.setFirmwareVersion(0, 1);
     Firmata.attach(ANALOG_MESSAGE, analogWriteCallback);
     Firmata.attach(REPORT_ANALOG, reportAnalogCallback);
 
