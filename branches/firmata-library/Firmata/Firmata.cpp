@@ -172,44 +172,18 @@ int FirmataClass::available(void)
 void FirmataClass::processSysexMessage(void)
 {
     switch(storedInputData[0]) { //first byte in buffer is command
-/*
-    case SYSEX_SERVO_ATTACH:
-        if(sysExBytesRead==2) {//sanity check
-            byte pin = storedInputData[1];
-            if(pin==9 || pin==10) { 
-                servos[pin-9].attach(pin);
-            }
-        }
-        //servos[storedInputData[1]-9].attach(storedInputData[1]);
-        break;
-    case SYSEX_SERVO_DETACH:
-        if(sysExBytesRead==2) {//sanity check
-            byte pin = storedInputData[1];
-            if(pin==9 || pin==10) { 
-                servos[pin-9].detach();
-            } 
-        }
-        break;
-    case SYSEX_SERVO_SETMINPULSE:
-        if(sysExBytesRead==4) {//sanity check
-            byte pin = storedInputData[1];
-            if(pin==9 || pin==10) { 
-                servos[pin-9].setMinimumPulse((storedInputData[3]  << 7) + storedInputData[2]);
-            } 
-        }
-        break;
-    case SYSEX_SERVO_SETMAXPULSE:
-        if(sysExBytesRead==4) {//sanity check
-            byte pin = storedInputData[1];
-            if(pin==9 || pin==10) { 
-                servos[pin-9].setMaximumPulse((storedInputData[3]  << 7) + storedInputData[2]);
-            } 
-        }
-        break;
-*/
     case REPORT_FIRMWARE:
         printFirmwareVersion();
         break;
+/*
+    case FIRMATA_STRING:
+        for(byte i=1; i < sysexBytesRead; i++) {
+            // TODO make bytes and add them to a buffer to send
+        }
+        break;
+*/
+    default:
+        (*currentSysexCallback)(storedInputData[0], sysexBytesRead - 1, storedInputData + 1);
     }
 }
 
@@ -368,7 +342,7 @@ void FirmataClass::sendString(byte command, const char* string)
 // send a string as the protocol string type
 void FirmataClass::sendString(const char* string) 
 {
-    sendString(SYSEX_STRING, string);
+    sendString(FIRMATA_STRING, string);
 }
 
 
@@ -386,9 +360,26 @@ void FirmataClass::attach(byte command, callbackFunction newFunction)
     }
 }
 
+void FirmataClass::attach(byte command, stringCallbackFunction newFunction)
+{
+    switch(command) {
+    case FIRMATA_STRING: currentStringCallback = newFunction; break;
+    }
+}
+
+void FirmataClass::attach(byte command, sysexCallbackFunction newFunction)
+{
+    currentSysexCallback = newFunction;
+}
+
 void FirmataClass::detach(byte command)
 {
-    attach(command, NULL);
+    switch(command) {
+    case FIRMATA_STRING: currentStringCallback = NULL; break;
+    case START_SYSEX: currentSysexCallback = NULL; break;
+    default:
+        attach(command, (callbackFunction)NULL);
+    }
 }
 
 // sysex callbacks
@@ -434,6 +425,8 @@ void FirmataClass::systemReset(void)
     currentReportAnalogCallback = NULL;
     currentReportDigitalCallback = NULL;
     currentPinModeCallback = NULL;
+    currentStringCallback = NULL;
+    currentSysexCallback = NULL;
 
     //sysexCallbackCount = 0;
     //sysexCallbackArray = NULL;

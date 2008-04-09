@@ -8,6 +8,7 @@
 
 Firmata	KEYWORD1
 callbackFunction	KEYWORD1
+stringCallbackFunction	KEYWORD1
 sysexCallbackFunction	KEYWORD1
 
 #######################################
@@ -48,6 +49,9 @@ REPORT_DIGITAL	LITERAL1
 REPORT_VERSION	LITERAL1
 SET_PIN_MODE	LITERAL1
 SYSTEM_RESET	LITERAL1
+
+START_SYSEX	LITERAL1
+END_SYSEX	LITERAL1
 
 PWM	LITERAL1
 
