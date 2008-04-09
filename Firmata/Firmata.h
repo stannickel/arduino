@@ -41,15 +41,15 @@
 #define END_SYSEX               0xF7 // end a MIDI Sysex message
 
 // extended command set using sysex (0-127/0x00-0x7f)
-#define SYSEX_SERVO_CONFIG      0x70 // set max angle, minPulse, maxPulse, freq
-#define SYSEX_STRING            0x71 // set a string via sysex
+#define SERVO_CONFIG            0x70 // set max angle, minPulse, maxPulse, freq
+#define FIRMATA_STRING          0x71 // a string message with 14-bits per char
 #define REPORT_FIRMWARE         0x79 // report name and version of the firmware
 #define SYSEX_NON_REALTIME      0x7E // MIDI Reserved for non-realtime messages
 #define SYSEX_REALTIME          0x7F // MIDI Reserved for realtime messages
 
 
 
-// for comparing along with INPUT and OUTPUT
+// pin modes
 //#define INPUT                 0x00 // defined in wiring.h
 //#define OUTPUT                0x01 // defined in wiring.h
 #define PWM                     0x02
@@ -58,7 +58,8 @@
 extern "C" {
 // callback function types
     typedef void (*callbackFunction)(byte, int);
-    typedef void (*sysexCallbackFunction)(byte, byte, byte*);
+    typedef void (*stringCallbackFunction)(byte, char*);
+    typedef void (*sysexCallbackFunction)(byte command, byte argc, byte*argv);
 }
 
 
@@ -88,6 +89,8 @@ public:
 	void sendSysex(byte command, byte bytec, byte* bytev);
 /* attach & detach callback functions to messages */
     void attach(byte command, callbackFunction newFunction);
+    void attach(byte command, stringCallbackFunction newFunction);
+    void attach(byte command, sysexCallbackFunction newFunction);
     void detach(byte command);
 // void flush()  // TODO implement flush
 
@@ -109,6 +112,7 @@ private:
     callbackFunction currentReportAnalogCallback;
     callbackFunction currentReportDigitalCallback;
     callbackFunction currentPinModeCallback;
+    stringCallbackFunction currentStringCallback;
     sysexCallbackFunction currentSysexCallback;
 //    byte sysexCallbackCount;
 //    sysexCallbackFunction* sysexCallbackArray;
@@ -131,7 +135,6 @@ extern FirmataClass Firmata;
  */
 #define setFirmwareVersion(x, y)   setFirmwareNameAndVersion(__FILE__, x, y)
 
-
 // total number of pins currently supported
 #if defined(__AVR_ATmega168__) // Arduino NG and Diecimila
 #define TOTAL_ANALOG_PINS       8
@@ -142,6 +145,9 @@ extern FirmataClass Firmata;
 #elif defined(__AVR_ATmega128__)  // Wiring
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      43
+#else
+#define TOTAL_ANALOG_PINS       8
+#define TOTAL_DIGITAL_PINS      14
 #endif
 
 
