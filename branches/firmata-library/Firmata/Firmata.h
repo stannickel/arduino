@@ -21,7 +21,7 @@
  * software can test whether it will be compatible with the currently
  * installed firmware. */
 #define FIRMATA_MAJOR_VERSION   1 // for non-compatible changes
-#define FIRMATA_MINOR_VERSION   0 // for backwards compatible changes
+#define FIRMATA_MINOR_VERSION   1 // for backwards compatible changes
 #define VERSION_BLINK_PIN       13 // digital pin to blink version on
 
 #define MAX_DATA_BYTES 32 // max number of data bytes in non-Sysex messages
