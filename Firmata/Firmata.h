@@ -58,7 +58,7 @@
 extern "C" {
 // callback function types
     typedef void (*callbackFunction)(byte, int);
-    typedef void (*stringCallbackFunction)(byte, char*);
+    typedef void (*stringCallbackFunction)(char*);
     typedef void (*sysexCallbackFunction)(byte command, byte argc, byte*argv);
 }
 
@@ -106,7 +106,7 @@ private:
 /* sysex */
     boolean parsingSysex;
     int sysexBytesRead;
-/* argc/argv pairs for callback functions */
+/* callback functions */
     callbackFunction currentAnalogCallback;
     callbackFunction currentDigitalCallback;
     callbackFunction currentReportAnalogCallback;
@@ -114,8 +114,6 @@ private:
     callbackFunction currentPinModeCallback;
     stringCallbackFunction currentStringCallback;
     sysexCallbackFunction currentSysexCallback;
-//    byte sysexCallbackCount;
-//    sysexCallbackFunction* sysexCallbackArray;
 
 /* private methods ------------------------------ */
     void processSysexMessage(void);
