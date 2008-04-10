@@ -175,14 +175,24 @@ void FirmataClass::processSysexMessage(void)
     case REPORT_FIRMWARE:
         printFirmwareVersion();
         break;
-/*
     case FIRMATA_STRING:
-        for(byte i=1; i < sysexBytesRead; i++) {
-            // TODO make bytes and add them to a buffer to send
+        if(currentStringCallback) {
+            byte bufferLength = (sysexBytesRead - 1) / 2;
+            char *buffer = (char*)malloc(bufferLength * sizeof(char));
+            byte i = 1;
+            byte j = 0;
+            while(j < bufferLength) {
+                buffer[j] = (char)storedInputData[i];
+                i++;
+                buffer[j] += (char)(storedInputData[i] << 7);
+                i++;
+                j++;
+            }
+            (*currentStringCallback)(buffer);
         }
         break;
-*/
     default:
+        if(currentSysexCallback)
         (*currentSysexCallback)(storedInputData[0], sysexBytesRead - 1, storedInputData + 1);
     }
 }
