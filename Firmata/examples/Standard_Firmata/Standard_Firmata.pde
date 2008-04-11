@@ -21,6 +21,9 @@
  * MACROS
  *============================================================================*/
 
+#define ANALOG_PORT                     2 // port# of analog used as digital
+#define TOTAL_PORTS                     3 // total number of ports for the board
+
 // these are used for EEPROM reading and writing
 #define ANALOGINPUTSTOREPORT_LOW_BYTE   0x1F0 // analogInputsToReport is an int
 #define ANALOGINPUTSTOREPORT_HIGH_BYTE  0x1F1 // analogInputsToReport is an int
@@ -30,6 +33,7 @@
 #define PWMSTATUS_LOW_BYTE              0x1F5 // pwmStatus is an int
 #define PWMSTATUS_HIGH_BYTE             0x1F6 // pwmStatus is an int
 
+
 /*==============================================================================
  * GLOBAL VARIABLES
  *============================================================================*/
@@ -38,9 +42,10 @@
 int analogInputsToReport = 0; // bitwise array to store pin reporting
 int analogPin = 0; // counter for reading analog pins
 /* digital pins */
-boolean digitalInputsEnabled = false; // output digital inputs or not
-int digitalInputs;
-int previousDigitalInputs; // previous output to test for change
+byte reportPINs[TOTAL_PORTS];
+byte previousPINs[TOTAL_PORTS];
+// TODO implement Pin status for ports
+byte portStatus[TOTAL_PORTS] = {B111111110, 0xFF, 0xFF};
 int digitalPinStatus = 65535; // store pin status, default OUTPUT
 /* PWM/analog outputs */
 int pwmStatus = 0; // bitwise array to store PWM status, default off
@@ -58,12 +63,22 @@ unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
  * to the Serial output queue using Serial.print() */
 void checkDigitalInputs(void) 
 {
-    if(digitalInputsEnabled) {
-        previousDigitalInputs = digitalInputs;
-        digitalInputs = PINB << 8; // pins 8-13 (14,15 for crystal are disabled)
-        digitalInputs = digitalInputs + (PIND &~ B00000011);//pins 2-7, ignore 0,1
-        if(digitalInputs != previousDigitalInputs) {
-            Firmata.sendDigitalPortPair(0, digitalInputs);
+    for(byte i=0; i < TOTAL_PORTS; i++) {
+        if(reportPINs[i]) {
+            switch(i) {
+            case 0: 
+                if(previousPINs[i] != PIND)
+                    Firmata.sendDigitalPort(0, PIND); 
+                break;
+            case 1: 
+                if(previousPINs[i] != PINB)
+                    Firmata.sendDigitalPort(1, PINB);
+                break;
+            case ANALOG_PORT: 
+                if(previousPINs[i] != PINC)
+                    Firmata.sendDigitalPort(ANALOG_PORT, PINC);
+                break;
+            }
         }
     }
 }
@@ -106,15 +121,18 @@ void digitalWriteCallback(byte port, int value)
  * toggle the pin when in INPUT mode in order to control the internal pull-up
  * resistor.  Perhaps there needs to be some safety on that tho.
  */
-    
-// pins 2-7  (0,1 are for the serial RX/TX, don't change their values)
-// 0xFF03 == B1111111100000011    0x03 == B00000011
-    PORTD = (value &~ 0xFF03) | (PORTD & 0x03);
-    
-//pins 8-13 (14,15 are disabled for the crystal) 
-// 0xFFC0 == B1111111111000000
-    PORTB = (value >> 8) &~ 0xFFC0;
-    
+    switch(port) {
+    case 0: // pins 2-7  (0,1 are serial RX/TX, don't change their values)
+        // 0xFF03 == B1111111100000011    0x03 == B00000011
+        PORTD = (value &~ 0xFF03) | (PORTD & 0x03);
+        break;
+    case 1: // pins 8-13 (14,15 are disabled for the crystal) 
+        PORTB = (byte)value;
+        break;
+    case 2: // analog pins used as digital
+        PORTC = (byte)value;
+        break;
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -135,10 +153,9 @@ void reportAnalogCallback(byte pin, int value)
 
 void reportDigitalCallback(byte port, int value)
 {
-    if(value == 0)
-        digitalInputsEnabled = false;
-    else
-        digitalInputsEnabled = true;
+    reportPINs[port] = (byte)value;
+    if(port == ANALOG_PORT) // turn off analog reporting when used as digital
+        analogInputsToReport = 0;
 }
 
 /*==============================================================================
@@ -158,6 +175,9 @@ void setup()
 
     for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
         setPinMode(i,OUTPUT);
+    }
+    for(i=0; i<TOTAL_PORTS; ++i) {
+        reportPINs[TOTAL_PORTS] = false;
     }
     // TODO: load state from EEPROM here
 

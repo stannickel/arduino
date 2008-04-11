@@ -305,30 +305,24 @@ void FirmataClass::sendDigital(byte pin, int value)
      * digital pins.
      */
 
-//    if(value == 0)
-//        sendDigitalPortPair();
-}
-
-// send 14-bits in a single digital message (protocol v1)
-void FirmataClass::sendDigitalPortPair(byte port, int value) 
-{
 	// TODO: the digital message should not be sent on the serial port every
 	// time sendDigital() is called.  Instead, it should add it to an int
 	// which will be sent on a schedule.  If a pin changes more than once
 	// before the digital message is sent on the serial port, it should send a
 	// digital message for each change.
- 
-	// TODO: some math needs to happen for pin > 14 since MIDI channels are used
-	Serial.print(DIGITAL_MESSAGE | (port & 0xF),BYTE);
-	Serial.print(value % 128, BYTE); // Tx pins 0-6
-	Serial.print(value >> 7, BYTE);  // Tx pins 7-13
+
+//    if(value == 0)
+//        sendDigitalPortPair();
 }
 
 
+// send 14-bits in a single digital message (protocol v1)
 // send an 8-bit port in a single digital message (protocol v2)
-void FirmataClass::sendDigitalPort(byte portNumber, byte portData)
+void FirmataClass::sendDigitalPort(byte portNumber, int portData)
 {
-    //TODO implement
+	Serial.print(DIGITAL_MESSAGE | (portNumber & 0xF),BYTE);
+	Serial.print(portData % 128, BYTE); // Tx bits 0-6
+	Serial.print(portData >> 7, BYTE);  // Tx bits 7-13
 }
 
 
@@ -438,12 +432,10 @@ void FirmataClass::systemReset(void)
     currentStringCallback = NULL;
     currentSysexCallback = NULL;
 
-    //sysexCallbackCount = 0;
-    //sysexCallbackArray = NULL;
     parsingSysex = false;
     sysexBytesRead = 0;
 
-    // TODO empty serial buffer here
+    //flush(); //TODO uncomment when Firmata is a subclass of HardwareSerial
 }
 
 
