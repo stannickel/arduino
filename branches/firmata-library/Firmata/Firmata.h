@@ -20,13 +20,13 @@
  * version numbers are important.  This number can be queried so that host
  * software can test whether it will be compatible with the currently
  * installed firmware. */
-#define FIRMATA_MAJOR_VERSION   1 // for non-compatible changes
-#define FIRMATA_MINOR_VERSION   1 // for backwards compatible changes
+#define FIRMATA_MAJOR_VERSION   2 // for non-compatible changes
+#define FIRMATA_MINOR_VERSION   0 // for backwards compatible changes
 #define VERSION_BLINK_PIN       13 // digital pin to blink version on
 
 #define MAX_DATA_BYTES 32 // max number of data bytes in non-Sysex messages
 
-// message command bytes (128-255/0x80-0xff)
+// message command bytes (128-255/0x80-0xFF)
 #define DIGITAL_MESSAGE         0x90 // send data for a digital pin
 #define ANALOG_MESSAGE          0xE0 // send data for an analog pin (or PWM)
 #define REPORT_ANALOG           0xC0 // enable analog input by pin #
@@ -40,7 +40,8 @@
 #define START_SYSEX             0xF0 // start a MIDI Sysex message
 #define END_SYSEX               0xF7 // end a MIDI Sysex message
 
-// extended command set using sysex (0-127/0x00-0x7f)
+// extended command set using sysex (0-127/0x00-0x7F)
+/* 0x00-0x0F reserved for custom commands */
 #define SERVO_CONFIG            0x70 // set max angle, minPulse, maxPulse, freq
 #define FIRMATA_STRING          0x71 // a string message with 14-bits per char
 #define REPORT_FIRMWARE         0x79 // report name and version of the firmware
@@ -63,6 +64,7 @@ extern "C" {
 }
 
 
+// TODO make it a subclass of HardwareSerial
 class FirmataClass
 {
 public:
@@ -82,17 +84,18 @@ public:
 /* serial send handling */
 	void sendAnalog(byte pin, int value);
 	void sendDigital(byte pin, int value);
-	void sendDigitalPortPair(byte port, int value);
-	void sendDigitalPort(byte portNumber, byte portData);
+	void sendDigitalPort(byte portNumber, int portData);
     void sendString(const char* string);
     void sendString(byte command, const char* string);
 	void sendSysex(byte command, byte bytec, byte* bytev);
+//    void print();  // TODO implement so it's compatible to Serial
+//    void println();  // TODO implement so it's compatible to Serial
 /* attach & detach callback functions to messages */
     void attach(byte command, callbackFunction newFunction);
     void attach(byte command, stringCallbackFunction newFunction);
     void attach(byte command, sysexCallbackFunction newFunction);
     void detach(byte command);
-// void flush()  // TODO implement flush
+// void flush();  // TODO implement flush, probably by subclassing
 
 private:
 /* firmware name and version */
