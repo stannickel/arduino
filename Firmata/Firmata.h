@@ -140,15 +140,23 @@ extern FirmataClass Firmata;
 #if defined(__AVR_ATmega168__) // Arduino NG and Diecimila
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      14
+#define TOTAL_PORTS             3 // total number of ports for the board
+#define ANALOG_PORT             2 // port# of analog used as digital
 #elif defined(__AVR_ATmega8__)  // old Arduinos
 #define TOTAL_ANALOG_PINS       6
 #define TOTAL_DIGITAL_PINS      14
+#define TOTAL_PORTS             3 // total number of ports for the board
+#define ANALOG_PORT             2 // port# of analog used as digital
 #elif defined(__AVR_ATmega128__)  // Wiring
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      43
-#else
+#define TOTAL_PORTS             5 // total number of ports for the board
+#define ANALOG_PORT             2 // port# of analog used as digital
+#else // anything else
 #define TOTAL_ANALOG_PINS       8
 #define TOTAL_DIGITAL_PINS      14
+#define TOTAL_PORTS             3 // total number of ports for the board
+#define ANALOG_PORT             2 // port# of analog used as digital
 #endif
 
 
