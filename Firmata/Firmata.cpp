@@ -98,8 +98,8 @@ void FirmataClass::begin(long speed)
 // output the protocol version message to the serial port
 void FirmataClass::printVersion(void) {
     Serial.print(REPORT_VERSION, BYTE);
-    Serial.print(FIRMATA_MINOR_VERSION, BYTE);
     Serial.print(FIRMATA_MAJOR_VERSION, BYTE);
+    Serial.print(FIRMATA_MINOR_VERSION, BYTE);
 }
 
 void FirmataClass::blinkVersion(void)
