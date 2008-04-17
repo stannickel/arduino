@@ -22,11 +22,8 @@ byte previousPORTs[TOTAL_PORTS];
 extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
 unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
 
-byte whichOutput = 0;
-
 void outputPort(byte portNumber, byte portValue)
 {
-    whichOutput = ++whichOutput % 128;
     if(previousPINs[portNumber] != portValue) {
         Firmata.sendDigitalPort(portNumber, portValue); 
         previousPINs[portNumber] = portValue;
