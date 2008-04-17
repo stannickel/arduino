@@ -17,6 +17,7 @@
 /* digital pins */
 byte reportPINs[TOTAL_PORTS];
 byte previousPINs[TOTAL_PORTS];
+byte previousPORTs[TOTAL_PORTS];
 
 extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
 unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
@@ -47,19 +48,27 @@ void checkDigitalInputs(void)
     }
 }
 
-// -----------------------------------------------------------------------------
-/* sets the pin mode to the correct state and sets the relevant bits in the
- * two bit-arrays that track Digital I/O and PWM status
- */
 void setPinModeCallback(byte pin, int mode) {
     if(pin > 1) { // ignore RxTx pins (0,1)
         pinMode(pin, mode);
     }
 }
 
-void digitalWriteCallback(byte pin, int value)
+void digitalWriteCallback(byte port, int value)
 {
-    pinMode(pin,OUTPUT);
+    byte i;
+    byte currentPinValue, previousPinValue;
+
+    if(value != previousPORTs[port]) {
+        for(i=0; i<8; i++) {
+            currentPinValue = (byte) value & (1 << i);
+            previousPinValue = previousPORTs[port] & (1 << i);
+            if(currentPinValue != previousPinValue) {
+                digitalWrite(i + (port*8), currentPinValue);
+            }
+        }
+        previousPORTs[port] = value;
+    }
 }
 
 void reportDigitalCallback(byte port, int value)
@@ -72,18 +81,16 @@ void setup()
     byte i;
     
     Firmata.setFirmwareVersion(0, 1);
-//    Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
+    Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
     Firmata.attach(SET_PIN_MODE, setPinModeCallback);
     Firmata.attach(REPORT_DIGITAL, reportDigitalCallback);
     
-    for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
-        setPinModeCallback(i,OUTPUT);
-//        pinMode(i,INPUT);
+    for(i=2; i<TOTAL_DIGITAL_PINS; ++i) { // ignore RxTx pins (0,1)
+        pinMode(i,OUTPUT);
     }
     for(i=0; i<TOTAL_PORTS; ++i) {
         reportPINs[i] = true;
     }
-
     Firmata.begin();
 }
 
@@ -94,7 +101,6 @@ void loop()
         checkDigitalInputs();
         while(Firmata.available()) {
             Firmata.processInput();
-//        checkDigitalInputs();
         }
     }
 }
