@@ -21,17 +21,6 @@
  * MACROS
  *============================================================================*/
 
-#define ANALOG_PORT                     2 // port# of analog used as digital
-#define TOTAL_PORTS                     3 // total number of ports for the board
-
-// these are used for EEPROM reading and writing
-#define ANALOGINPUTSTOREPORT_LOW_BYTE   0x1F0 // analogInputsToReport is an int
-#define ANALOGINPUTSTOREPORT_HIGH_BYTE  0x1F1 // analogInputsToReport is an int
-#define REPORTDIGITALINPUTS_BYTE        0x1F2 // 
-#define DIGITALPINSTATUS_LOW_BYTE       0x1F3 // digitalPinStatus is an int
-#define DIGITALPINSTATUS_HIGH_BYTE      0x1F4 // digitalPinStatus is an int
-#define PWMSTATUS_LOW_BYTE              0x1F5 // pwmStatus is an int
-#define PWMSTATUS_HIGH_BYTE             0x1F6 // pwmStatus is an int
 
 
 /*==============================================================================
@@ -41,14 +30,12 @@
 /* analog inputs */
 int analogInputsToReport = 0; // bitwise array to store pin reporting
 int analogPin = 0; // counter for reading analog pins
+
 /* digital pins */
-byte reportPINs[TOTAL_PORTS];
-byte previousPINs[TOTAL_PORTS];
-// TODO implement Pin status for ports
-byte portStatus[TOTAL_PORTS] = {B111111110, 0xFF, 0xFF};
-int digitalPinStatus = 65535; // store pin status, default OUTPUT
-/* PWM/analog outputs */
-int pwmStatus = 0; // bitwise array to store PWM status, default off
+byte reportPINs[TOTAL_PORTS];   // PIN == input port
+byte previousPINs[TOTAL_PORTS]; // PIN == input port
+byte pinStatus[TOTAL_DIGITAL_PINS]; // store pin status, default OUTPUT
+
 /* timer variables */
 extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
 unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
@@ -58,26 +45,27 @@ unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
  * FUNCTIONS                                                                
  *============================================================================*/
 
+void outputPort(byte portNumber, byte portValue)
+{
+    if(previousPINs[portNumber] != portValue) {
+        Firmata.sendDigitalPort(portNumber, portValue); 
+        previousPINs[portNumber] = portValue;
+        Firmata.sendDigitalPort(portNumber, portValue); 
+    }
+}
+
 /* -----------------------------------------------------------------------------
  * check all the active digital inputs for change of state, then add any events
  * to the Serial output queue using Serial.print() */
 void checkDigitalInputs(void) 
 {
-    for(byte i=0; i < TOTAL_PORTS; i++) {
+    byte i, tmp;
+    for(i=0; i < TOTAL_PORTS; i++) {
         if(reportPINs[i]) {
             switch(i) {
-            case 0: 
-                if(previousPINs[i] != PIND)
-                    Firmata.sendDigitalPort(0, PIND); 
-                break;
-            case 1: 
-                if(previousPINs[i] != PINB)
-                    Firmata.sendDigitalPort(1, PINB);
-                break;
-            case ANALOG_PORT: 
-                if(previousPINs[i] != PINC)
-                    Firmata.sendDigitalPort(ANALOG_PORT, PINC);
-                break;
+            case 0: outputPort(0, PIND &~ B00000011); break; // ignore Rx/Tx 0/1
+            case 1: outputPort(1, PINB); break;
+            case ANALOG_PORT: outputPort(ANALOG_PORT, PINC); break;
             }
         }
     }
@@ -87,40 +75,32 @@ void checkDigitalInputs(void)
 /* sets the pin mode to the correct state and sets the relevant bits in the
  * two bit-arrays that track Digital I/O and PWM status
  */
-void setPinMode(byte pin, int mode) {
-  if(pin > 1) { // ignore RxTx pins (0,1)
-	if(mode == INPUT) {
-	  digitalPinStatus = digitalPinStatus &~ (1 << pin);
-	  pwmStatus = pwmStatus &~ (1 << pin);
-	  digitalWrite(pin,LOW); // turn off pin before switching to INPUT
-	  pinMode(pin,INPUT);
-	}
-	else if(mode == OUTPUT) {
-	  digitalPinStatus = digitalPinStatus | (1 << pin);
-	  pwmStatus = pwmStatus &~ (1 << pin);
-	  pinMode(pin,OUTPUT);
-	}
-	else if( mode == PWM ) {
-	  digitalPinStatus = digitalPinStatus | (1 << pin);
-	  pwmStatus = pwmStatus | (1 << pin);
-	  pinMode(pin,OUTPUT);
-	}
-  // TODO: save status to EEPROM here, if changed
-  }
+void setPinModeCallback(byte pin, int mode) {
+    if(pin > 1) { // ignore RxTx pins (0,1)
+        pinStatus[pin] = mode;
+        switch(mode) {
+        case INPUT:
+        case OUTPUT:
+            pinMode(pin, mode);
+            break;
+        case PWM:
+            pinMode(pin,OUTPUT);
+            break;
+        default:
+            Firmata.sendString("");
+        }
+        // TODO: save status to EEPROM here, if changed
+    }
 }
 
 void analogWriteCallback(byte pin, int value)
 {
-    setPinMode(pin,PWM);
+    setPinModeCallback(pin,PWM);
     analogWrite(pin, value);
 }
 
 void digitalWriteCallback(byte port, int value)
 {
-/* TODO should digitalPinStatus still be used?  it is useful to be able to
- * toggle the pin when in INPUT mode in order to control the internal pull-up
- * resistor.  Perhaps there needs to be some safety on that tho.
- */
     switch(port) {
     case 0: // pins 2-7  (0,1 are serial RX/TX, don't change their values)
         // 0xFF03 == B1111111100000011    0x03 == B00000011
@@ -171,19 +151,22 @@ void setup()
     Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
     Firmata.attach(REPORT_ANALOG, reportAnalogCallback);
     Firmata.attach(REPORT_DIGITAL, reportDigitalCallback);
-    Firmata.attach(SET_PIN_MODE, setPinMode);
+    Firmata.attach(SET_PIN_MODE, setPinModeCallback);
 
     for(i=0; i<TOTAL_DIGITAL_PINS; ++i) {
-        setPinMode(i,OUTPUT);
+        setPinModeCallback(i,OUTPUT);
     }
     for(i=0; i<TOTAL_PORTS; ++i) {
-        reportPINs[TOTAL_PORTS] = false;
+        reportPINs[i] = false;
     }
     // TODO: load state from EEPROM here
 
-    /* TODO: send digital inputs here, if enabled, to set the initial state on the
-     * host computer, since once in the loop(), the Arduino will only send data on
-     * change. */
+    /* send digital inputs here, if enabled, to set the initial state on the
+     * host computer, since once in the loop(), this firmware will only send
+     * digital data on change. */
+    if(reportPINs[0]) outputPort(0, PIND &~ B00000011); // ignore Rx/Tx 0/1
+    if(reportPINs[1]) outputPort(1, PINB);
+    if(reportPINs[ANALOG_PORT]) outputPort(ANALOG_PORT, PINC);
 
     Firmata.begin();
 }
