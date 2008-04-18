@@ -19,17 +19,12 @@ byte previousPORT[2];
 
 void outputPort(byte portNumber, byte portValue)
 {
+// only send the data when it changes, otherwise you get too many messages!
     if(previousPIN[portNumber] != portValue) {
         Firmata.sendDigitalPort(portNumber, portValue); 
         previousPIN[portNumber] = portValue;
         Firmata.sendDigitalPort(portNumber, portValue); 
     }
-}
-
-void checkDigitalInputs(void) 
-{
-    outputPort(0, PIND &~ B00000011); // pins 0-7, ignoring Rx/Tx pins (0/1)
-    outputPort(1, PINB); // pins 8-13
 }
 
 void setPinModeCallback(byte pin, int mode) {
@@ -57,8 +52,6 @@ void digitalWriteCallback(byte port, int value)
 
 void setup()
 {
-    byte i;
-    
     Firmata.setFirmwareVersion(0, 1);
     Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
     Firmata.attach(SET_PIN_MODE, setPinModeCallback);
@@ -67,7 +60,8 @@ void setup()
 
 void loop()
 {
-    checkDigitalInputs();
+    outputPort(0, PIND &~ B00000011); // pins 0-7, ignoring Rx/Tx pins (0/1)
+    outputPort(1, PINB); // pins 8-13
     while(Firmata.available()) {
         Firmata.processInput();
     }
