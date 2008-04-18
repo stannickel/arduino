@@ -14,39 +14,26 @@
  */
 #include <Firmata.h>
 
-/* digital pins */
-byte reportPINs[TOTAL_PORTS];
-byte previousPINs[TOTAL_PORTS];
-byte previousPORTs[TOTAL_PORTS];
-
-extern volatile unsigned long timer0_overflow_count; // timer0 from wiring.c
-unsigned long nextExecuteTime; // for comparison with timer0_overflow_count
+byte previousPIN[2];  // PIN means PORT for input
+byte previousPORT[2]; 
 
 void outputPort(byte portNumber, byte portValue)
 {
-    if(previousPINs[portNumber] != portValue) {
+    if(previousPIN[portNumber] != portValue) {
         Firmata.sendDigitalPort(portNumber, portValue); 
-        previousPINs[portNumber] = portValue;
+        previousPIN[portNumber] = portValue;
         Firmata.sendDigitalPort(portNumber, portValue); 
     }
 }
 
 void checkDigitalInputs(void) 
 {
-    byte i, tmp;
-    for(i=0; i < TOTAL_PORTS; i++) {
-        if(reportPINs[i]) {
-            switch(i) {
-            case 0: outputPort(0, PIND); break;
-            case 1: outputPort(1, PINB); break;
-            case ANALOG_PORT: outputPort(ANALOG_PORT, PINC); break;
-            }
-        }
-    }
+    outputPort(0, PIND &~ B00000011); // pins 0-7, ignoring Rx/Tx pins (0/1)
+    outputPort(1, PINB); // pins 8-13
 }
 
 void setPinModeCallback(byte pin, int mode) {
-    if(pin > 1) { // ignore RxTx pins (0,1)
+    if(pin > 1) { // don't touch RxTx pins (0,1)
         pinMode(pin, mode);
     }
 }
@@ -56,21 +43,16 @@ void digitalWriteCallback(byte port, int value)
     byte i;
     byte currentPinValue, previousPinValue;
 
-    if(value != previousPORTs[port]) {
+    if(value != previousPORT[port]) {
         for(i=0; i<8; i++) {
             currentPinValue = (byte) value & (1 << i);
-            previousPinValue = previousPORTs[port] & (1 << i);
+            previousPinValue = previousPORT[port] & (1 << i);
             if(currentPinValue != previousPinValue) {
                 digitalWrite(i + (port*8), currentPinValue);
             }
         }
-        previousPORTs[port] = value;
+        previousPORT[port] = value;
     }
-}
-
-void reportDigitalCallback(byte port, int value)
-{
-    reportPINs[port] = (byte)value;
 }
 
 void setup()
@@ -80,24 +62,13 @@ void setup()
     Firmata.setFirmwareVersion(0, 1);
     Firmata.attach(DIGITAL_MESSAGE, digitalWriteCallback);
     Firmata.attach(SET_PIN_MODE, setPinModeCallback);
-    Firmata.attach(REPORT_DIGITAL, reportDigitalCallback);
-    
-    for(i=2; i<TOTAL_DIGITAL_PINS; ++i) { // ignore RxTx pins (0,1)
-        pinMode(i,OUTPUT);
-    }
-    for(i=0; i<TOTAL_PORTS; ++i) {
-        reportPINs[i] = true;
-    }
     Firmata.begin();
 }
 
 void loop()
 {
-    if(timer0_overflow_count > nextExecuteTime) {  
-        nextExecuteTime = timer0_overflow_count + 19; // run this every 20ms
-        checkDigitalInputs();
-        while(Firmata.available()) {
-            Firmata.processInput();
-        }
+    checkDigitalInputs();
+    while(Firmata.available()) {
+        Firmata.processInput();
     }
 }
