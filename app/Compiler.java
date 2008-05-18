@@ -474,7 +474,7 @@ public class Compiler implements MessageConsumer {
     }
   }
   
-  static private List getCommandCompilerC(String avrBasePath, List includePaths,
+  static public List getCommandCompilerC(String avrBasePath, List includePaths,
     String sourceName, String objectName) {
     List baseCommandCompiler = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-gcc",
@@ -497,7 +497,7 @@ public class Compiler implements MessageConsumer {
   }
   
   
-  static private List getCommandCompilerCPP(String avrBasePath,
+  static public List getCommandCompilerCPP(String avrBasePath,
     List includePaths, String sourceName, String objectName) {
       List baseCommandCompilerCPP = new ArrayList(Arrays.asList(new String[] {
       avrBasePath + "avr-g++",
