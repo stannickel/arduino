@@ -214,6 +214,92 @@
 		33CF03CE09662DC000F2C9A9 /* antlr.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03CF09662DC000F2C9A9 /* registry.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
 		33CF03D009662DC000F2C9A9 /* oro.jar in Copy Java Resources */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; settings = {JAVA_ARCHIVE_SUBDIR = ../shared/lib; }; };
+		33E958D10DD69EB60096DE93 /* Compiler.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE260965BD100016AC38 /* Compiler.java */; };
+		33E958D20DD69EB60096DE93 /* CompilerTest.java in Sources */ = {isa = PBXBuildFile; fileRef = 33E957D50DD698830096DE93 /* CompilerTest.java */; };
+		33E958D30DD69EB60096DE93 /* Preferences.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE330965BD110016AC38 /* Preferences.java */; };
+		33E958D40DD69EC30096DE93 /* junit-4.4.jar in Resources */ = {isa = PBXBuildFile; fileRef = 33E9584D0DD69DCD0096DE93 /* junit-4.4.jar */; };
+		33E958E50DD69F160096DE93 /* Archiver.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDD309D6E8D800430D5B /* Archiver.java */; };
+		33E958E60DD69F160096DE93 /* AutoFormat.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE720965BD110016AC38 /* AutoFormat.java */; };
+		33E958E70DD69F160096DE93 /* AvrdudeUploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33F944E00C2B33560093EB9C /* AvrdudeUploader.java */; };
+		33E958E80DD69F160096DE93 /* Base.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE240965BD100016AC38 /* Base.java */; };
+		33E958E90DD69F160096DE93 /* CTokenMarker.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE600965BD110016AC38 /* CTokenMarker.java */; };
+		33E958EA0DD69F160096DE93 /* DefaultInputHandler.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE610965BD110016AC38 /* DefaultInputHandler.java */; };
+		33E958EB0DD69F160096DE93 /* DiscourseFormat.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29230C8CCC5E00D8A7F4 /* DiscourseFormat.java */; };
+		33E958EC0DD69F160096DE93 /* Editor.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE270965BD100016AC38 /* Editor.java */; };
+		33E958ED0DD69F160096DE93 /* EditorButtons.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE280965BD100016AC38 /* EditorButtons.java */; };
+		33E958EE0DD69F160096DE93 /* EditorConsole.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE290965BD110016AC38 /* EditorConsole.java */; };
+		33E958EF0DD69F160096DE93 /* EditorHeader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2A0965BD110016AC38 /* EditorHeader.java */; };
+		33E958F00DD69F160096DE93 /* EditorLineStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2B0965BD110016AC38 /* EditorLineStatus.java */; };
+		33E958F10DD69F160096DE93 /* EditorListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2C0965BD110016AC38 /* EditorListener.java */; };
+		33E958F20DD69F160096DE93 /* EditorStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2D0965BD110016AC38 /* EditorStatus.java */; };
+		33E958F30DD69F160096DE93 /* ExportFolder.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDD409D6E8D800430D5B /* ExportFolder.java */; };
+		33E958F40DD69F160096DE93 /* FindReplace.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE2E0965BD110016AC38 /* FindReplace.java */; };
+		33E958F50DD69F160096DE93 /* InputHandler.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE620965BD110016AC38 /* InputHandler.java */; };
+		33E958F60DD69F160096DE93 /* JEditTextArea.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE630965BD110016AC38 /* JEditTextArea.java */; };
+		33E958F70DD69F160096DE93 /* KeywordMap.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE640965BD110016AC38 /* KeywordMap.java */; };
+		33E958F80DD69F160096DE93 /* Library.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEE0CD09D7446100430D5B /* Library.java */; };
+		33E958F90DD69F160096DE93 /* LibraryManager.java in Sources */ = {isa = PBXBuildFile; fileRef = 33BEDDB009D6DC1300430D5B /* LibraryManager.java */; };
+		33E958FA0DD69F160096DE93 /* MessageConsumer.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE300965BD110016AC38 /* MessageConsumer.java */; };
+		33E958FB0DD69F160096DE93 /* MessageSiphon.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE310965BD110016AC38 /* MessageSiphon.java */; };
+		33E958FC0DD69F160096DE93 /* MessageStream.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE320965BD110016AC38 /* MessageStream.java */; };
+		33E958FD0DD69F160096DE93 /* PdeKeywords.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE650965BD110016AC38 /* PdeKeywords.java */; };
+		33E958FE0DD69F160096DE93 /* PdePreprocessor.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE3C0965BD110016AC38 /* PdePreprocessor.java */; };
+		33E958FF0DD69F160096DE93 /* PdeTextAreaDefaults.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE660965BD110016AC38 /* PdeTextAreaDefaults.java */; };
+		33E959000DD69F160096DE93 /* PresentMode.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE550965BD110016AC38 /* PresentMode.java */; };
+		33E959010DD69F160096DE93 /* readme.txt in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE670965BD110016AC38 /* readme.txt */; };
+		33E959020DD69F160096DE93 /* Runner.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE560965BD110016AC38 /* Runner.java */; };
+		33E959030DD69F160096DE93 /* RunnerClassLoader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE570965BD110016AC38 /* RunnerClassLoader.java */; };
+		33E959040DD69F160096DE93 /* RunnerException.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE580965BD110016AC38 /* RunnerException.java */; };
+		33E959050DD69F160096DE93 /* Serial.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE590965BD110016AC38 /* Serial.java */; };
+		33E959060DD69F160096DE93 /* SerialException.java in Sources */ = {isa = PBXBuildFile; fileRef = 33055EFE0CB8187600824CD9 /* SerialException.java */; };
+		33E959070DD69F160096DE93 /* Sizer.java in Sources */ = {isa = PBXBuildFile; fileRef = 332D4DB509CF147F00BF81F6 /* Sizer.java */; };
+		33E959080DD69F160096DE93 /* Sketch.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5A0965BD110016AC38 /* Sketch.java */; };
+		33E959090DD69F160096DE93 /* Sketchbook.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5B0965BD110016AC38 /* Sketchbook.java */; };
+		33E9590A0DD69F160096DE93 /* SketchCode.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5C0965BD110016AC38 /* SketchCode.java */; };
+		33E9590B0DD69F160096DE93 /* SketchHistory.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5D0965BD110016AC38 /* SketchHistory.java */; };
+		33E9590C0DD69F160096DE93 /* SwingWorker.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE5E0965BD110016AC38 /* SwingWorker.java */; };
+		33E9590D0DD69F160096DE93 /* SyntaxDocument.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE680965BD110016AC38 /* SyntaxDocument.java */; };
+		33E9590E0DD69F160096DE93 /* SyntaxStyle.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE690965BD110016AC38 /* SyntaxStyle.java */; };
+		33E9590F0DD69F160096DE93 /* SyntaxUtilities.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6A0965BD110016AC38 /* SyntaxUtilities.java */; };
+		33E959100DD69F160096DE93 /* Target.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE700965BD110016AC38 /* Target.java */; };
+		33E959110DD69F160096DE93 /* TextAreaDefaults.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6B0965BD110016AC38 /* TextAreaDefaults.java */; };
+		33E959120DD69F160096DE93 /* TextAreaPainter.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6C0965BD110016AC38 /* TextAreaPainter.java */; };
+		33E959130DD69F160096DE93 /* TextUtilities.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6D0965BD110016AC38 /* TextUtilities.java */; };
+		33E959140DD69F160096DE93 /* Token.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6E0965BD110016AC38 /* Token.java */; };
+		33E959150DD69F160096DE93 /* TokenMarker.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE6F0965BD110016AC38 /* TokenMarker.java */; };
+		33E959160DD69F160096DE93 /* UpdateCheck.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE730965BD110016AC38 /* UpdateCheck.java */; };
+		33E959170DD69F160096DE93 /* Uploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33FFFE740965BD110016AC38 /* Uploader.java */; };
+		33E9591B0DD69F340096DE93 /* PApplet.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29070C8CCC0900D8A7F4 /* PApplet.java */; };
+		33E9591C0DD69F340096DE93 /* PConstants.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29080C8CCC0900D8A7F4 /* PConstants.java */; };
+		33E9591D0DD69F340096DE93 /* PFont.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29090C8CCC0900D8A7F4 /* PFont.java */; };
+		33E9591E0DD69F340096DE93 /* PGraphics.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290A0C8CCC0900D8A7F4 /* PGraphics.java */; };
+		33E9591F0DD69F340096DE93 /* PGraphics2D.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290B0C8CCC0900D8A7F4 /* PGraphics2D.java */; };
+		33E959200DD69F340096DE93 /* PGraphics3D.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290C0C8CCC0900D8A7F4 /* PGraphics3D.java */; };
+		33E959210DD69F340096DE93 /* PGraphicsJava2D.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290D0C8CCC0900D8A7F4 /* PGraphicsJava2D.java */; };
+		33E959220DD69F340096DE93 /* PImage.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290E0C8CCC0900D8A7F4 /* PImage.java */; };
+		33E959230DD69F340096DE93 /* PLine.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A290F0C8CCC0900D8A7F4 /* PLine.java */; };
+		33E959240DD69F340096DE93 /* PMatrix.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29100C8CCC0900D8A7F4 /* PMatrix.java */; };
+		33E959250DD69F340096DE93 /* PPolygon.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29110C8CCC0900D8A7F4 /* PPolygon.java */; };
+		33E959260DD69F340096DE93 /* PShape.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29120C8CCC0900D8A7F4 /* PShape.java */; };
+		33E959270DD69F340096DE93 /* PTriangle.java in Sources */ = {isa = PBXBuildFile; fileRef = 335A29130C8CCC0900D8A7F4 /* PTriangle.java */; };
+		33E959310DD69F6A0096DE93 /* antlr.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; };
+		33E959320DD69F6A0096DE93 /* libquaqua.jnilib in Frameworks */ = {isa = PBXBuildFile; fileRef = 335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */; };
+		33E959330DD69F6A0096DE93 /* librxtxSerial.jnilib in Frameworks */ = {isa = PBXBuildFile; fileRef = A33729630D224FA700E82412 /* librxtxSerial.jnilib */; };
+		33E959340DD69F6A0096DE93 /* mrj.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620C0965D67900B514A9 /* mrj.jar */; };
+		33E959350DD69F6A0096DE93 /* oro.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; };
+		33E959360DD69F6A0096DE93 /* quaqua.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 335A28F30C8CCAF700D8A7F4 /* quaqua.jar */; };
+		33E959370DD69F6A0096DE93 /* registry.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; };
+		33E959380DD69F6A0096DE93 /* RXTXcomm.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33AF620F0965D67A00B514A9 /* RXTXcomm.jar */; };
+		33E959960DD6A6660096DE93 /* antlr.jar in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620A0965D67800B514A9 /* antlr.jar */; };
+		33E959970DD6A6660096DE93 /* libquaqua.jnilib in Resources */ = {isa = PBXBuildFile; fileRef = 335A28F20C8CCAF700D8A7F4 /* libquaqua.jnilib */; };
+		33E959980DD6A6660096DE93 /* librxtxSerial.jnilib in Resources */ = {isa = PBXBuildFile; fileRef = A33729630D224FA700E82412 /* librxtxSerial.jnilib */; };
+		33E959990DD6A6660096DE93 /* mrj.jar in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620C0965D67900B514A9 /* mrj.jar */; };
+		33E9599A0DD6A6660096DE93 /* oro.jar in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620D0965D67900B514A9 /* oro.jar */; };
+		33E9599B0DD6A6660096DE93 /* quaqua.jar in Resources */ = {isa = PBXBuildFile; fileRef = 335A28F30C8CCAF700D8A7F4 /* quaqua.jar */; };
+		33E9599C0DD6A6660096DE93 /* registry.jar in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620E0965D67A00B514A9 /* registry.jar */; };
+		33E9599D0DD6A6660096DE93 /* RXTXcomm.jar in Resources */ = {isa = PBXBuildFile; fileRef = 33AF620F0965D67A00B514A9 /* RXTXcomm.jar */; };
+		33E959A20DD6A6930096DE93 /* junit-4.4.jar in Frameworks */ = {isa = PBXBuildFile; fileRef = 33E9584D0DD69DCD0096DE93 /* junit-4.4.jar */; };
+		33E994E80DDE76860073C33F /* PdePreprocessorTest.java in Sources */ = {isa = PBXBuildFile; fileRef = 33E994E70DDE76860073C33F /* PdePreprocessorTest.java */; };
 		33F944E10C2B33560093EB9C /* AvrdudeUploader.java in Sources */ = {isa = PBXBuildFile; fileRef = 33F944E00C2B33560093EB9C /* AvrdudeUploader.java */; };
 		33FF071F0965C1E30016AC38 /* about.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 33FF01DE0965BD160016AC38 /* about.jpg */; };
 		33FF07220965C1E30016AC38 /* buttons.gif in Resources */ = {isa = PBXBuildFile; fileRef = 33FF02770965BD160016AC38 /* buttons.gif */; };
@@ -350,6 +436,10 @@
 		33BEE0CD09D7446100430D5B /* Library.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = Library.java; sourceTree = "<group>"; };
 		33CF03B009662CA800F2C9A9 /* arduino.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = arduino.icns; path = dist/arduino.icns; sourceTree = "<group>"; };
 		33DD8FB6096AC8DA0013AF8F /* Arduino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Arduino.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33E957D50DD698830096DE93 /* CompilerTest.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; name = CompilerTest.java; path = test/CompilerTest.java; sourceTree = "<group>"; };
+		33E9584D0DD69DCD0096DE93 /* junit-4.4.jar */ = {isa = PBXFileReference; lastKnownFileType = archive.jar; path = "junit-4.4.jar"; sourceTree = "<group>"; };
+		33E958CF0DD69EA70096DE93 /* Test.jar */ = {isa = PBXFileReference; explicitFileType = archive.jar; includeInIndex = 0; path = Test.jar; sourceTree = BUILT_PRODUCTS_DIR; };
+		33E994E70DDE76860073C33F /* PdePreprocessorTest.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; name = PdePreprocessorTest.java; path = test/PdePreprocessorTest.java; sourceTree = "<group>"; };
 		33F944E00C2B33560093EB9C /* AvrdudeUploader.java */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.java; path = AvrdudeUploader.java; sourceTree = "<group>"; };
 		33FF01DE0965BD160016AC38 /* about.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = about.jpg; sourceTree = "<group>"; };
 		33FF02770965BD160016AC38 /* buttons.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = buttons.gif; sourceTree = "<group>"; };
@@ -428,6 +518,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33E958CD0DD69EA70096DE93 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33E959310DD69F6A0096DE93 /* antlr.jar in Frameworks */,
+				33E959320DD69F6A0096DE93 /* libquaqua.jnilib in Frameworks */,
+				33E959330DD69F6A0096DE93 /* librxtxSerial.jnilib in Frameworks */,
+				33E959340DD69F6A0096DE93 /* mrj.jar in Frameworks */,
+				33E959A20DD6A6930096DE93 /* junit-4.4.jar in Frameworks */,
+				33E959350DD69F6A0096DE93 /* oro.jar in Frameworks */,
+				33E959360DD69F6A0096DE93 /* quaqua.jar in Frameworks */,
+				33E959370DD69F6A0096DE93 /* registry.jar in Frameworks */,
+				33E959380DD69F6A0096DE93 /* RXTXcomm.jar in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -451,6 +557,22 @@
 			name = core;
 			path = ../../core;
 			sourceTree = SOURCE_ROOT;
+		};
+		33E957C80DD697390096DE93 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				33E957D50DD698830096DE93 /* CompilerTest.java */,
+			);
+			name = test;
+			sourceTree = "<group>";
+		};
+		33E994E90DDE76920073C33F /* test */ = {
+			isa = PBXGroup;
+			children = (
+				33E994E70DDE76860073C33F /* PdePreprocessorTest.java */,
+			);
+			name = test;
+			sourceTree = "<group>";
 		};
 		33FF01DA0965BD160016AC38 /* shared */ = {
 			isa = PBXGroup;
@@ -524,6 +646,7 @@
 		33FFFD3D0965B1E40016AC38 = {
 			isa = PBXGroup;
 			children = (
+				33E9584D0DD69DCD0096DE93 /* junit-4.4.jar */,
 				33CF03B009662CA800F2C9A9 /* arduino.icns */,
 				33FFFE220965BD100016AC38 /* app */,
 				335A29060C8CCC0800D8A7F4 /* core */,
@@ -533,12 +656,14 @@
 				33FF02B70965BD170016AC38 /* readme.txt */,
 				33FF02DC0965BD170016AC38 /* todo.txt */,
 				33DD8FB6096AC8DA0013AF8F /* Arduino.app */,
+				33E958CF0DD69EA70096DE93 /* Test.jar */,
 			);
 			sourceTree = "<group>";
 		};
 		33FFFE220965BD100016AC38 /* app */ = {
 			isa = PBXGroup;
 			children = (
+				33E957C80DD697390096DE93 /* test */,
 				33055EFE0CB8187600824CD9 /* SerialException.java */,
 				33F944E00C2B33560093EB9C /* AvrdudeUploader.java */,
 				33BEE0CD09D7446100430D5B /* Library.java */,
@@ -583,6 +708,7 @@
 		33FFFE340965BD110016AC38 /* preproc */ = {
 			isa = PBXGroup;
 			children = (
+				33E994E90DDE76920073C33F /* test */,
 				33FFFE3C0965BD110016AC38 /* PdePreprocessor.java */,
 			);
 			path = preproc;
@@ -681,6 +807,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33E958CC0DD69EA70096DE93 /* JavaArchive */ = {
+			isa = PBXJavaArchiveBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXJavaArchiveBuildPhase section */
 
 /* Begin PBXProject section */
@@ -702,6 +835,7 @@
 				33FFFE1C0965BBEF0016AC38 /* Setup */,
 				33AF61680965C4C600B514A9 /* App */,
 				33269DE20D6E7A67006BB2E3 /* Distribute */,
+				33E958CE0DD69EA70096DE93 /* Test */,
 			);
 		};
 /* End PBXProject section */
@@ -728,6 +862,22 @@
 				33FF07310965C1E30016AC38 /* tab-unsel-menu.gif in Resources */,
 				33FF07320965C1E30016AC38 /* tab-unsel-mid.gif in Resources */,
 				33FF07330965C1E30016AC38 /* tab-unsel-right.gif in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33E959900DD6A6580096DE93 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33E959960DD6A6660096DE93 /* antlr.jar in Resources */,
+				33E958D40DD69EC30096DE93 /* junit-4.4.jar in Resources */,
+				33E959970DD6A6660096DE93 /* libquaqua.jnilib in Resources */,
+				33E959980DD6A6660096DE93 /* librxtxSerial.jnilib in Resources */,
+				33E959990DD6A6660096DE93 /* mrj.jar in Resources */,
+				33E9599A0DD6A6660096DE93 /* oro.jar in Resources */,
+				33E9599B0DD6A6660096DE93 /* quaqua.jar in Resources */,
+				33E9599C0DD6A6660096DE93 /* registry.jar in Resources */,
+				33E9599D0DD6A6660096DE93 /* RXTXcomm.jar in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -852,6 +1002,81 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		33E958CB0DD69EA70096DE93 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				33E9591B0DD69F340096DE93 /* PApplet.java in Sources */,
+				33E9591C0DD69F340096DE93 /* PConstants.java in Sources */,
+				33E9591D0DD69F340096DE93 /* PFont.java in Sources */,
+				33E9591E0DD69F340096DE93 /* PGraphics.java in Sources */,
+				33E9591F0DD69F340096DE93 /* PGraphics2D.java in Sources */,
+				33E959200DD69F340096DE93 /* PGraphics3D.java in Sources */,
+				33E959210DD69F340096DE93 /* PGraphicsJava2D.java in Sources */,
+				33E959220DD69F340096DE93 /* PImage.java in Sources */,
+				33E959230DD69F340096DE93 /* PLine.java in Sources */,
+				33E959240DD69F340096DE93 /* PMatrix.java in Sources */,
+				33E959250DD69F340096DE93 /* PPolygon.java in Sources */,
+				33E959260DD69F340096DE93 /* PShape.java in Sources */,
+				33E959270DD69F340096DE93 /* PTriangle.java in Sources */,
+				33E958E50DD69F160096DE93 /* Archiver.java in Sources */,
+				33E958E60DD69F160096DE93 /* AutoFormat.java in Sources */,
+				33E958E70DD69F160096DE93 /* AvrdudeUploader.java in Sources */,
+				33E958E80DD69F160096DE93 /* Base.java in Sources */,
+				33E958D10DD69EB60096DE93 /* Compiler.java in Sources */,
+				33E958D20DD69EB60096DE93 /* CompilerTest.java in Sources */,
+				33E958E90DD69F160096DE93 /* CTokenMarker.java in Sources */,
+				33E958EA0DD69F160096DE93 /* DefaultInputHandler.java in Sources */,
+				33E958EB0DD69F160096DE93 /* DiscourseFormat.java in Sources */,
+				33E958EC0DD69F160096DE93 /* Editor.java in Sources */,
+				33E958ED0DD69F160096DE93 /* EditorButtons.java in Sources */,
+				33E958EE0DD69F160096DE93 /* EditorConsole.java in Sources */,
+				33E958EF0DD69F160096DE93 /* EditorHeader.java in Sources */,
+				33E958F00DD69F160096DE93 /* EditorLineStatus.java in Sources */,
+				33E958F10DD69F160096DE93 /* EditorListener.java in Sources */,
+				33E958F20DD69F160096DE93 /* EditorStatus.java in Sources */,
+				33E958F30DD69F160096DE93 /* ExportFolder.java in Sources */,
+				33E958F40DD69F160096DE93 /* FindReplace.java in Sources */,
+				33E958F50DD69F160096DE93 /* InputHandler.java in Sources */,
+				33E958F60DD69F160096DE93 /* JEditTextArea.java in Sources */,
+				33E958F70DD69F160096DE93 /* KeywordMap.java in Sources */,
+				33E958F80DD69F160096DE93 /* Library.java in Sources */,
+				33E958F90DD69F160096DE93 /* LibraryManager.java in Sources */,
+				33E958FA0DD69F160096DE93 /* MessageConsumer.java in Sources */,
+				33E958FB0DD69F160096DE93 /* MessageSiphon.java in Sources */,
+				33E958FC0DD69F160096DE93 /* MessageStream.java in Sources */,
+				33E958FD0DD69F160096DE93 /* PdeKeywords.java in Sources */,
+				33E958FE0DD69F160096DE93 /* PdePreprocessor.java in Sources */,
+				33E958FF0DD69F160096DE93 /* PdeTextAreaDefaults.java in Sources */,
+				33E958D30DD69EB60096DE93 /* Preferences.java in Sources */,
+				33E959000DD69F160096DE93 /* PresentMode.java in Sources */,
+				33E959010DD69F160096DE93 /* readme.txt in Sources */,
+				33E959020DD69F160096DE93 /* Runner.java in Sources */,
+				33E959030DD69F160096DE93 /* RunnerClassLoader.java in Sources */,
+				33E959040DD69F160096DE93 /* RunnerException.java in Sources */,
+				33E959050DD69F160096DE93 /* Serial.java in Sources */,
+				33E959060DD69F160096DE93 /* SerialException.java in Sources */,
+				33E959070DD69F160096DE93 /* Sizer.java in Sources */,
+				33E959080DD69F160096DE93 /* Sketch.java in Sources */,
+				33E959090DD69F160096DE93 /* Sketchbook.java in Sources */,
+				33E9590A0DD69F160096DE93 /* SketchCode.java in Sources */,
+				33E9590B0DD69F160096DE93 /* SketchHistory.java in Sources */,
+				33E9590C0DD69F160096DE93 /* SwingWorker.java in Sources */,
+				33E9590D0DD69F160096DE93 /* SyntaxDocument.java in Sources */,
+				33E9590E0DD69F160096DE93 /* SyntaxStyle.java in Sources */,
+				33E9590F0DD69F160096DE93 /* SyntaxUtilities.java in Sources */,
+				33E959100DD69F160096DE93 /* Target.java in Sources */,
+				33E959110DD69F160096DE93 /* TextAreaDefaults.java in Sources */,
+				33E959120DD69F160096DE93 /* TextAreaPainter.java in Sources */,
+				33E959130DD69F160096DE93 /* TextUtilities.java in Sources */,
+				33E959140DD69F160096DE93 /* Token.java in Sources */,
+				33E959150DD69F160096DE93 /* TokenMarker.java in Sources */,
+				33E959160DD69F160096DE93 /* UpdateCheck.java in Sources */,
+				33E959170DD69F160096DE93 /* Uploader.java in Sources */,
+				33E994E80DDE76860073C33F /* PdePreprocessorTest.java in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -866,6 +1091,25 @@
 			targetProxy = 33269DF70D6E7AD4006BB2E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXToolTarget section */
+		33E958CE0DD69EA70096DE93 /* Test */ = {
+			isa = PBXToolTarget;
+			buildConfigurationList = 33E958DC0DD69ED20096DE93 /* Build configuration list for PBXToolTarget "Test" */;
+			buildPhases = (
+				33E958CB0DD69EA70096DE93 /* Sources */,
+				33E958CC0DD69EA70096DE93 /* JavaArchive */,
+				33E958CD0DD69EA70096DE93 /* Frameworks */,
+				33E959900DD6A6580096DE93 /* Resources */,
+			);
+			dependencies = (
+			);
+			name = Test;
+			productInstallPath = /usr/local/bin;
+			productName = Test;
+			productReference = 33E958CF0DD69EA70096DE93 /* Test.jar */;
+		};
+/* End PBXToolTarget section */
 
 /* Begin XCBuildConfiguration section */
 		33269DEE0D6E7A7E006BB2E3 /* work */ = {
@@ -900,6 +1144,118 @@
 			};
 			name = work;
 		};
+		33E958DD0DD69ED20096DE93 /* work */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				JAVA_ARCHIVE_CLASSES = YES;
+				JAVA_ARCHIVE_TYPE = JAR;
+				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_SOURCE_SUBDIR = .;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/dist",
+				);
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Test;
+				PURE_JAVA = YES;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = work;
+		};
+		33E959890DD6A4F40096DE93 /* test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Arduino;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = test;
+		};
+		33E9598A0DD6A4F40096DE93 /* test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "";
+				HEADER_SEARCH_PATHS = "";
+				JAVA_CLASS_SEARCH_PATHS = "../shared/lib/registry.jar ../shared/lib/antlr.jar ../shared/lib/mrj.jar ../shared/lib/RXTXcomm.jar ../shared/lib/oro.jar";
+				JAVA_COMPILER_SOURCE_VERSION = 1.4;
+				JAVA_COMPILER_TARGET_VM_VERSION = 1.4;
+				JAVA_ONLY = YES;
+				JAVA_SOURCE_SUBDIR = .;
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Arduino;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = app;
+			};
+			name = test;
+		};
+		33E9598B0DD6A4F40096DE93 /* test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = Distribute;
+			};
+			name = test;
+		};
+		33E9598C0DD6A4F40096DE93 /* test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				JAVA_ARCHIVE_CLASSES = YES;
+				JAVA_ARCHIVE_TYPE = JAR;
+				JAVA_COMPILER = /usr/bin/javac;
+				JAVA_SOURCE_SUBDIR = .;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/dist",
+				);
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Test;
+				PURE_JAVA = YES;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+			};
+			name = test;
+		};
+		33E9598D0DD6A4F40096DE93 /* test */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = test;
+		};
 		33FFFD410965B1E40016AC38 /* work */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -933,6 +1289,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33269DEE0D6E7A7E006BB2E3 /* work */,
+				33E9598B0DD6A4F40096DE93 /* test */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = work;
@@ -941,6 +1298,16 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33AF616C0965C4CB00B514A9 /* work */,
+				33E9598A0DD6A4F40096DE93 /* test */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = work;
+		};
+		33E958DC0DD69ED20096DE93 /* Build configuration list for PBXToolTarget "Test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				33E958DD0DD69ED20096DE93 /* work */,
+				33E9598C0DD6A4F40096DE93 /* test */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = work;
@@ -949,6 +1316,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33FFFD410965B1E40016AC38 /* work */,
+				33E9598D0DD6A4F40096DE93 /* test */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = work;
@@ -957,6 +1325,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				33FFFE200965BC300016AC38 /* work */,
+				33E959890DD6A4F40096DE93 /* test */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = work;
