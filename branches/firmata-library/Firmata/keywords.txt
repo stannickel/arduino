@@ -8,6 +8,7 @@
 
 Firmata	KEYWORD1
 callbackFunction	KEYWORD1
+systemResetCallbackFunction	KEYWORD1
 stringCallbackFunction	KEYWORD1
 sysexCallbackFunction	KEYWORD1
 
