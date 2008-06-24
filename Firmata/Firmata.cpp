@@ -202,6 +202,8 @@ void FirmataClass::processInput(void)
     int inputData = Serial.read(); // this is 'int' to handle -1 when no data
     int command;
     
+    // TODO make sure it handles -1 properly
+
     if (parsingSysex) {
         if(inputData == END_SYSEX) {
             //stop sysex byte      
@@ -364,6 +366,13 @@ void FirmataClass::attach(byte command, callbackFunction newFunction)
     }
 }
 
+void FirmataClass::attach(byte command, systemResetCallbackFunction newFunction)
+{
+    switch(command) {
+    case SYSTEM_RESET: currentSystemResetCallback = newFunction; break;
+    }
+}
+
 void FirmataClass::attach(byte command, stringCallbackFunction newFunction)
 {
     switch(command) {
@@ -379,6 +388,7 @@ void FirmataClass::attach(byte command, sysexCallbackFunction newFunction)
 void FirmataClass::detach(byte command)
 {
     switch(command) {
+    case SYSTEM_RESET: currentSystemResetCallback = NULL; break;
     case FIRMATA_STRING: currentStringCallback = NULL; break;
     case START_SYSEX: currentSysexCallback = NULL; break;
     default:
@@ -424,16 +434,11 @@ void FirmataClass::systemReset(void)
         storedInputData[i] = 0;
     }
 
-    currentAnalogCallback = NULL;
-    currentDigitalCallback = NULL;
-    currentReportAnalogCallback = NULL;
-    currentReportDigitalCallback = NULL;
-    currentPinModeCallback = NULL;
-    currentStringCallback = NULL;
-    currentSysexCallback = NULL;
-
     parsingSysex = false;
     sysexBytesRead = 0;
+
+    if(currentSystemResetCallback)
+                    (*currentSystemResetCallback)();
 
     //flush(); //TODO uncomment when Firmata is a subclass of HardwareSerial
 }

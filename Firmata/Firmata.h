@@ -59,6 +59,7 @@
 extern "C" {
 // callback function types
     typedef void (*callbackFunction)(byte, int);
+    typedef void (*systemResetCallbackFunction)(void);
     typedef void (*stringCallbackFunction)(char*);
     typedef void (*sysexCallbackFunction)(byte command, byte argc, byte*argv);
 }
@@ -92,6 +93,7 @@ public:
 //    void println();  // TODO implement so it's compatible to Serial
 /* attach & detach callback functions to messages */
     void attach(byte command, callbackFunction newFunction);
+    void attach(byte command, systemResetCallbackFunction newFunction);
     void attach(byte command, stringCallbackFunction newFunction);
     void attach(byte command, sysexCallbackFunction newFunction);
     void detach(byte command);
@@ -115,6 +117,7 @@ private:
     callbackFunction currentReportAnalogCallback;
     callbackFunction currentReportDigitalCallback;
     callbackFunction currentPinModeCallback;
+    systemResetCallbackFunction currentSystemResetCallback;
     stringCallbackFunction currentStringCallback;
     sysexCallbackFunction currentSysexCallback;
 
