@@ -152,8 +152,8 @@ extern FirmataClass Firmata;
 #define ANALOG_PORT             2  // port# of analog used as digital
 #elif defined(__AVR_ATmega128__)// Wiring
 #define TOTAL_ANALOG_PINS       8
-#define TOTAL_DIGITAL_PINS      43
-#define TOTAL_PORTS             5 // total number of ports for the board
+#define TOTAL_DIGITAL_PINS      51
+#define TOTAL_PORTS             6 // total number of ports for the board
 #define ANALOG_PORT             2 // port# of analog used as digital
 #else // anything else
 #define TOTAL_ANALOG_PINS       6
