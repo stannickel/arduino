@@ -68,8 +68,8 @@ FirmataClass::FirmataClass(void)
 /* begin method for overriding default serial bitrate */
 void FirmataClass::begin(void)
 {
-    blinkVersion();
     Serial.begin(115200);
+    blinkVersion();
     delay(300);
     printVersion();
 }
